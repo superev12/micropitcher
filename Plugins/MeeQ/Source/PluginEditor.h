@@ -8,5 +8,8 @@ public:
     explicit MeeQAudioProcessorEditor(MeeQAudioProcessor&);
 
     void paint(juce::Graphics&) override;
-    void resized() override {}
+    void resized() override;
+
+private:
+    juce::Slider gainSlider;
 };

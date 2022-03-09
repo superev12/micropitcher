@@ -1,13 +1,15 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-constexpr bool shouldUseGenericEditor = true;
+constexpr bool shouldUseGenericEditor = false;
 
 MeeQAudioProcessor::MeeQAudioProcessor()
 {
     parameters.add(*this);
 }
 
+
+//
 void MeeQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
                                                    juce::MidiBuffer& midiMessages)
 
