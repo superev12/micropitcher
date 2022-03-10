@@ -1,6 +1,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+// set to true to enable Juce generic editor
+// note: setSize() is ignored in generic mode
 constexpr bool shouldUseGenericEditor = false;
 
 MeeQAudioProcessor::MeeQAudioProcessor()
@@ -10,8 +12,7 @@ MeeQAudioProcessor::MeeQAudioProcessor()
 
 
 //
-void MeeQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
-                                                   juce::MidiBuffer& midiMessages)
+void MeeQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 
 {
     juce::ignoreUnused(midiMessages);

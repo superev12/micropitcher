@@ -18,7 +18,7 @@ if (UniversalBinary)
 endif()
 
 #static linking in Windows
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 #Adds all the module sources so they appear correctly in the IDE
 set_property(GLOBAL PROPERTY USE_FOLDERS YES)

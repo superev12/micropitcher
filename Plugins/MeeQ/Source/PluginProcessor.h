@@ -2,6 +2,7 @@
 
 #include "Parameters.h"
 
+// define class and call base class constructor
 class MeeQAudioProcessor : public PluginHelpers::ProcessorBase
 {
 public:
