@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(CMakeJUCEPrototype)
+project(micropitcher)
 
 #including CPM.cmake, a package manager:
 #https://github.com/TheLartians/CPM.cmake
@@ -35,7 +35,7 @@ option(JUCE_BUILD_EXAMPLES "Build JUCE Examples" OFF)
 CPMAddPackage("gh:juce-framework/JUCE#master")
 
 #By default, we are building the provided plugin/app examples:
-option(BUILD_JUCE_PROTOTYPE_EXAMPLES "Build JUCE prototype examples" ON)
+option(BUILD_JUCE_PROTOTYPE_EXAMPLES "Build JUCE prototype examples" OFF)
 
 #adding any custom modules you might have:
 add_subdirectory(Modules)
@@ -45,6 +45,9 @@ if (${BUILD_JUCE_PROTOTYPE_EXAMPLES})
     add_subdirectory(Apps)
     add_subdirectory(Plugins)
 endif()
+
+#Include the source
+add_subdirectory(src)
 
 option(BUILD_UNIT_TESTS "Build JUCE prototype examples" ON)
 
