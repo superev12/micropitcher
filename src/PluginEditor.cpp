@@ -5,7 +5,9 @@ MicropitcherEditor::MicropitcherEditor(MicropitcherProcessor& p)
     : AudioProcessorEditor(&p)
 {
     auto area = getLocalBounds();
-    setSize(400, 300);
+    setSize(400, 400);
+    setResizable(true, true);
+    setResizeLimits(400, 400, 99999, 99999);
     addAndMakeVisible(mainComponent);
 }
 
