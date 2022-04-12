@@ -1,39 +1,37 @@
+
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-constexpr bool shouldUseGenericEditor = true;
+constexpr bool shouldUseGenericEditor = false;
 
-MeeQAudioProcessor::MeeQAudioProcessor()
+MicropitcherProcessor::MicropitcherProcessor()
 {
-    parameters.add(*this);
 }
 
-void MeeQAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
+void MicropitcherProcessor::processBlock(juce::AudioBuffer<float>& buffer,
                                                    juce::MidiBuffer& midiMessages)
 
 {
     juce::ignoreUnused(midiMessages);
 
-    if (parameters.enable->get())
-        buffer.applyGain(parameters.gain->get());
-    else
-        buffer.clear();
+    buffer.clear();
 }
 
-juce::AudioProcessorEditor* MeeQAudioProcessor::createEditor()
+juce::AudioProcessorEditor* MicropitcherProcessor::createEditor()
 {
     if (shouldUseGenericEditor)
         return new juce::GenericAudioProcessorEditor(*this);
     else
-        return new MeeQAudioProcessorEditor(*this);
+        return new MicropitcherEditor(*this);
 }
 
-void MeeQAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
+void MicropitcherProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
     //Serializes your parameters, and any other potential data into an XML:
 
     juce::ValueTree params("Params");
 
+    /*
     for (auto& param: getParameters())
     {
         juce::ValueTree paramTree(PluginHelpers::getParamID(param));
@@ -43,16 +41,18 @@ void MeeQAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 
     juce::ValueTree pluginPreset("MyPlugin");
     pluginPreset.appendChild(params, nullptr);
+    */
     //This a good place to add any non-parameters to your preset
 
-    copyXmlToBinary(*pluginPreset.createXml(), destData);
+    //copyXmlToBinary(*pluginPreset.createXml(), destData);
 }
 
-void MeeQAudioProcessor::setStateInformation(const void* data,
+void MicropitcherProcessor::setStateInformation(const void* data,
                                                           int sizeInBytes)
 {
     //Loads your parameters, and any other potential data from an XML:
 
+    /*
     auto xml = getXmlFromBinary(data, sizeInBytes);
 
     if (xml != nullptr)
@@ -70,9 +70,10 @@ void MeeQAudioProcessor::setStateInformation(const void* data,
 
         //Load your non-parameter data now
     }
+    */
 }
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new MeeQAudioProcessor();
+    return new MicropitcherProcessor();
 }

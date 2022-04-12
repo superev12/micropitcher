@@ -2,10 +2,10 @@
 
 #include "PluginProcessor.h"
 
-class MeeQAudioProcessorEditor : public juce::AudioProcessorEditor
+class MicropitcherEditor : public juce::AudioProcessorEditor
 {
 public:
-    explicit MeeQAudioProcessorEditor(MeeQAudioProcessor&);
+    explicit MicropitcherEditor(MicropitcherProcessor&);
 
     void paint(juce::Graphics&) override;
     void resized() override {}

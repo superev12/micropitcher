@@ -3,7 +3,7 @@ project(<micropitcher> VERSION 0.0.1)
 set (BaseTargetName micropitcher)
 
 juce_add_plugin("${BaseTargetName}"
-    COMPANY_NAME "Evan RHYS Snoswell"
+    COMPANY_NAME "Evan Snoswell"
     IS_SYNTH FALSE
     NEEDS_MIDI_INPUT FALSE
     NEEDS_MIDI_OUTPUT TRUE
