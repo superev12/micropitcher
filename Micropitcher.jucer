@@ -7,6 +7,10 @@
   <MAINGROUP id="keYNKX" name="Micropitcher">
     <GROUP id="{028C3A6B-C65A-6981-3205-17ABD5CF209C}" name="Source">
       <GROUP id="{F196B614-0323-FCFD-A04B-1100B6A1A8C2}" name="Components">
+        <FILE id="Y7pyYL" name="GraphComponent.cpp" compile="1" resource="0"
+              file="Source/Components/GraphComponent.cpp"/>
+        <FILE id="igp3lE" name="GraphComponent.h" compile="0" resource="0"
+              file="Source/Components/GraphComponent.h"/>
         <FILE id="Nb6CzU" name="MainComponent.cpp" compile="1" resource="0"
               file="Source/Components/MainComponent.cpp"/>
         <FILE id="ieu32r" name="MainComponent.h" compile="0" resource="0" file="Source/Components/MainComponent.h"/>

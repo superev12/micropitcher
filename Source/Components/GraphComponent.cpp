@@ -20,23 +20,23 @@
 //[Headers] You can add your own extra header files here...
 //[/Headers]
 
-#include "GraphContainerComponent.h"
+#include "GraphComponent.h"
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
-#include "GraphComponent.h"
 //[/MiscUserDefs]
 
 //==============================================================================
-GraphContainerComponent::GraphContainerComponent (juce::ValueTree& state) : valueTree(state)
+GraphComponent::GraphComponent ()
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    juce__viewport.reset (new juce::Viewport ("new viewport"));
-    addAndMakeVisible (juce__viewport.get());
-    juce__viewport->setScrollBarsShown (true, true);
-    juce__viewport->setViewedComponent (new GraphComponent());
+    internalPath1.setUsingNonZeroWinding (false);
+    internalPath1.startNewSubPath (274.0f, 204.0f);
+    internalPath1.cubicTo (312.0f, 178.0f, 320.0f, 218.0f, 368.0f, 202.0f);
+    internalPath1.cubicTo (432.0f, 186.0f, 472.0f, 242.0f, 362.0f, 292.0f);
+    internalPath1.lineTo (234.0f, 342.0f);
 
 
     //[UserPreSize]
@@ -46,16 +46,14 @@ GraphContainerComponent::GraphContainerComponent (juce::ValueTree& state) : valu
 
 
     //[Constructor] You can add your own custom stuff here..
-    valueTree.addListener(this);
     //[/Constructor]
 }
 
-GraphContainerComponent::~GraphContainerComponent()
+GraphComponent::~GraphComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    juce__viewport = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -63,24 +61,40 @@ GraphContainerComponent::~GraphContainerComponent()
 }
 
 //==============================================================================
-void GraphContainerComponent::paint (juce::Graphics& g)
+void GraphComponent::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
     g.fillAll (juce::Colour (0xff323e44));
 
+    {
+        float x = 244.0f, y = 220.0f, width = 100.0f, height = 100.0f;
+        juce::Colour fillColour = juce::Colour (0xffa52aa4);
+        //[UserPaintCustomArguments] Customize the painting arguments here..
+        //[/UserPaintCustomArguments]
+        g.setColour (fillColour);
+        g.fillRoundedRectangle (x, y, width, height, 10.000f);
+    }
+
+    {
+        float x = 0, y = 0;
+        juce::Colour strokeColour = juce::Colour (0xff4ea52a);
+        //[UserPaintCustomArguments] Customize the painting arguments here..
+        //[/UserPaintCustomArguments]
+        g.setColour (strokeColour);
+        g.strokePath (internalPath1, juce::PathStrokeType (5.000f), juce::AffineTransform::translation(x, y));
+    }
+
     //[UserPaint] Add your own custom painting code here..
-    g.fillAll (backgroundColour);
     //[/UserPaint]
 }
 
-void GraphContainerComponent::resized()
+void GraphComponent::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    juce__viewport->setBounds ((getWidth() / 2) - ((getWidth() - 20) / 2), (getHeight() / 2) + -2 - ((getHeight() - 20) / 2), getWidth() - 20, getHeight() - 20);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -88,19 +102,6 @@ void GraphContainerComponent::resized()
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void GraphContainerComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& id)
-{
-    static juce::Identifier propertyName("button");
-    if ((bool) valueTree[id]) {
-        DBG("valueTree change triggered to green");
-        backgroundColour = juce::Colours::green;
-        this->repaint();
-    } else {
-        DBG("valueTree change triggered to purple");
-        backgroundColour = juce::Colours::purple;
-        this->repaint();
-    }
-}
 //[/MiscUserCode]
 
 
@@ -113,15 +114,16 @@ void GraphContainerComponent::valueTreePropertyChanged(juce::ValueTree& tree, co
 
 BEGIN_JUCER_METADATA
 
-<JUCER_COMPONENT documentType="Component" className="GraphContainerComponent"
-                 componentName="" parentClasses="public juce::Component" constructorParams=""
-                 variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
-                 overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
-  <BACKGROUND backgroundColour="ff323e44"/>
-  <VIEWPORT name="new viewport" id="1b7864cd13d512e6" memberName="juce__viewport"
-            virtualName="" explicitFocusOrder="0" pos="0.5Cc -2Cc 20M 20M"
-            vscroll="0" hscroll="0" scrollbarThickness="8" contentType="2"
-            jucerFile="" contentClass="GraphComponent" constructorParams=""/>
+<JUCER_COMPONENT documentType="Component" className="GraphComponent" componentName=""
+                 parentClasses="public juce::Component" constructorParams="" variableInitialisers=""
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="0" initialWidth="600" initialHeight="400">
+  <BACKGROUND backgroundColour="ff323e44">
+    <ROUNDRECT pos="244 220 100 100" cornerSize="10.0" fill="solid: ffa52aa4"
+               hasStroke="0"/>
+    <PATH pos="0 0 100 100" fill="solid: a5962a" hasStroke="1" stroke="5, mitered, butt"
+          strokeColour="solid: ff4ea52a" nonZeroWinding="0">s 274 204 c 312 178 320 218  368 202 c 432 186 472 242  362 292 l 234 342</PATH>
+  </BACKGROUND>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
