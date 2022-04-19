@@ -27,7 +27,12 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-MainComponent::MainComponent ()
+MainComponent::MainComponent (juce::ValueTree& state)
+    : valueTree(state),
+    
+      toolbarComponent(valueTree),
+      graphComponent(valueTree),
+      detailsComponent(valueTree)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]

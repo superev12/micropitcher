@@ -27,7 +27,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-GraphComponent::GraphComponent ()
+GraphComponent::GraphComponent (juce::ValueTree& state)
+    : valueTree(state)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -44,6 +45,7 @@ GraphComponent::GraphComponent ()
 
 
     //[Constructor] You can add your own custom stuff here..
+    valueTree.addListener(this);
     //[/Constructor]
 }
 
@@ -65,7 +67,7 @@ void GraphComponent::paint (juce::Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (juce::Colour (0xff323e44));
+    g.fillAll (juce::Colour (backgroundColour));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -84,6 +86,17 @@ void GraphComponent::resized()
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void GraphComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& id)
+{
+    static juce::Identifier propertyName("button");
+    if ((bool) valueTree[id]) {
+        DBG("valueTree change triggered to green");
+        backgroundColour = juce::Colours::green;
+    } else {
+        DBG("valueTree change triggered to purple");
+        backgroundColour = juce::Colours::purple;
+    }
+}
 //[/MiscUserCode]
 
 

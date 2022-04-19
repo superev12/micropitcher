@@ -24,10 +24,11 @@
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
+static juce::Identifier propertyName("button");
 //[/MiscUserDefs]
 
 //==============================================================================
-ToolbarComponent::ToolbarComponent ()
+ToolbarComponent::ToolbarComponent (juce::ValueTree& state) : valueTree(state)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -97,11 +98,13 @@ void ToolbarComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     if (buttonThatWasClicked == juce__textButton.get())
     {
         //[UserButtonCode_juce__textButton] -- add your button handler code here..
+        valueTree.setProperty(propertyName, true, nullptr);
         //[/UserButtonCode_juce__textButton]
     }
     else if (buttonThatWasClicked == juce__textButton2.get())
     {
         //[UserButtonCode_juce__textButton2] -- add your button handler code here..
+        valueTree.setProperty(propertyName, false, nullptr);
         //[/UserButtonCode_juce__textButton2]
     }
 

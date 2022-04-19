@@ -37,7 +37,7 @@ class DetailsComponent  : public juce::Component
 {
 public:
     //==============================================================================
-    DetailsComponent ();
+    DetailsComponent (juce::ValueTree&);
     ~DetailsComponent() override;
 
     //==============================================================================
@@ -51,6 +51,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    juce::ValueTree valueTree;
     //[/UserVariables]
 
     //==============================================================================

@@ -40,7 +40,7 @@ class MainComponent  : public juce::Component
 {
 public:
     //==============================================================================
-    MainComponent ();
+    MainComponent (juce::ValueTree&);
     ~MainComponent() override;
 
     //==============================================================================
@@ -54,9 +54,12 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    juce::ValueTree valueTree;
+
     ToolbarComponent toolbarComponent;
     GraphComponent graphComponent;
     DetailsComponent detailsComponent;
+        
     //[/UserVariables]
 
     //==============================================================================

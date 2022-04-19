@@ -166,7 +166,7 @@ bool MicropitcherAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* MicropitcherAudioProcessor::createEditor()
 {
-    return new MicropitcherAudioProcessorEditor (*this);
+    return new MicropitcherAudioProcessorEditor (*this, valueTree);
 }
 
 //==============================================================================

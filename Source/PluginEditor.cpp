@@ -10,8 +10,14 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-MicropitcherAudioProcessorEditor::MicropitcherAudioProcessorEditor (MicropitcherAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), mainComponent()
+MicropitcherAudioProcessorEditor::MicropitcherAudioProcessorEditor (
+  MicropitcherAudioProcessor& p,
+  juce::ValueTree& state
+)
+  : AudioProcessorEditor (&p),
+    audioProcessor (p),
+    valueTree(state),
+    mainComponent(valueTree)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.

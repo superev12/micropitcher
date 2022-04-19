@@ -27,7 +27,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-DetailsComponent::DetailsComponent ()
+DetailsComponent::DetailsComponent (juce::ValueTree& state) : valueTree(state)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]

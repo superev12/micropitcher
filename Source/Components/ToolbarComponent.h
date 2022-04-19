@@ -38,7 +38,7 @@ class ToolbarComponent  : public juce::Component,
 {
 public:
     //==============================================================================
-    ToolbarComponent ();
+    ToolbarComponent (juce::ValueTree&);
     ~ToolbarComponent() override;
 
     //==============================================================================
@@ -53,6 +53,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    juce::ValueTree valueTree;
     //[/UserVariables]
 
     //==============================================================================
