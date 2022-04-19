@@ -33,12 +33,12 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class GraphComponent  : public juce::Component, public juce::ValueTree::Listener
+class GraphContainerComponent  : public juce::Component, public juce::ValueTree::Listener
 {
 public:
     //==============================================================================
-    GraphComponent (juce::ValueTree&);
-    ~GraphComponent() override;
+    GraphContainerComponent (juce::ValueTree&);
+    ~GraphContainerComponent() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
@@ -61,7 +61,7 @@ private:
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphContainerComponent)
 };
 
 //[EndFile] You can add extra defines here...

@@ -20,15 +20,14 @@
 //[Headers] You can add your own extra header files here...
 //[/Headers]
 
-#include "GraphComponent.h"
+#include "GraphContainerComponent.h"
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-GraphComponent::GraphComponent (juce::ValueTree& state)
-    : valueTree(state)
+GraphContainerComponent::GraphContainerComponent (juce::ValueTree& state) : valueTree(state)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -49,7 +48,7 @@ GraphComponent::GraphComponent (juce::ValueTree& state)
     //[/Constructor]
 }
 
-GraphComponent::~GraphComponent()
+GraphContainerComponent::~GraphContainerComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
@@ -62,18 +61,19 @@ GraphComponent::~GraphComponent()
 }
 
 //==============================================================================
-void GraphComponent::paint (juce::Graphics& g)
+void GraphContainerComponent::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (juce::Colour (backgroundColour));
+    g.fillAll (juce::Colour (0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
+    g.fillAll (backgroundColour);
     //[/UserPaint]
 }
 
-void GraphComponent::resized()
+void GraphContainerComponent::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
@@ -86,15 +86,17 @@ void GraphComponent::resized()
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void GraphComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& id)
+void GraphContainerComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& id)
 {
     static juce::Identifier propertyName("button");
     if ((bool) valueTree[id]) {
         DBG("valueTree change triggered to green");
         backgroundColour = juce::Colours::green;
+        this->repaint();
     } else {
         DBG("valueTree change triggered to purple");
         backgroundColour = juce::Colours::purple;
+        this->repaint();
     }
 }
 //[/MiscUserCode]
@@ -109,13 +111,13 @@ void GraphComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce:
 
 BEGIN_JUCER_METADATA
 
-<JUCER_COMPONENT documentType="Component" className="GraphComponent" componentName=""
-                 parentClasses="public juce::Component" constructorParams="" variableInitialisers=""
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="600" initialHeight="400">
+<JUCER_COMPONENT documentType="Component" className="GraphContainerComponent"
+                 componentName="" parentClasses="public juce::Component" constructorParams=""
+                 variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
+                 overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <VIEWPORT name="new viewport" id="1b7864cd13d512e6" memberName="juce__viewport"
-            virtualName="" explicitFocusOrder="0" pos="0Cc -1.5Cc 20M 20M"
+            virtualName="" explicitFocusOrder="0" pos="0.5Cc -2Cc 20M 20M"
             vscroll="0" hscroll="0" scrollbarThickness="8" contentType="0"
             jucerFile="" contentClass="" constructorParams=""/>
 </JUCER_COMPONENT>

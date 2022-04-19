@@ -29,10 +29,9 @@
 //==============================================================================
 MainComponent::MainComponent (juce::ValueTree& state)
     : valueTree(state),
-    
       toolbarComponent(valueTree),
-      graphComponent(valueTree),
-      detailsComponent(valueTree)
+      detailsComponent(valueTree),
+      graphContainerComponent(valueTree)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -69,7 +68,7 @@ void MainComponent::paint (juce::Graphics& g)
 
     //[UserPaint] Add your own custom painting code here..
     addAndMakeVisible(toolbarComponent);
-    addAndMakeVisible(graphComponent);
+    addAndMakeVisible(graphContainerComponent);
     addAndMakeVisible(detailsComponent);
     //[/UserPaint]
 }
@@ -83,7 +82,7 @@ void MainComponent::resized()
     auto area = getLocalBounds();
     toolbarComponent.setBounds(area.removeFromLeft(40));
     detailsComponent.setBounds(area.removeFromRight(150));
-    graphComponent.setBounds(area);
+    graphContainerComponent.setBounds(area);
     //[/UserResized]
 }
 

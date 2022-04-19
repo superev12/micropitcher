@@ -14,10 +14,10 @@
               file="Source/Components/ToolbarComponent.cpp"/>
         <FILE id="UivacR" name="ToolbarComponent.h" compile="0" resource="0"
               file="Source/Components/ToolbarComponent.h"/>
-        <FILE id="JYEKvQ" name="GraphComponent.cpp" compile="1" resource="0"
-              file="Source/Components/GraphComponent.cpp"/>
-        <FILE id="tEs3z9" name="GraphComponent.h" compile="0" resource="0"
-              file="Source/Components/GraphComponent.h"/>
+        <FILE id="JYEKvQ" name="GraphContainerComponent.cpp" compile="1" resource="0"
+              file="Source/Components/GraphContainerComponent.cpp"/>
+        <FILE id="tEs3z9" name="GraphContainerComponent.h" compile="0" resource="0"
+              file="Source/Components/GraphContainerComponent.h"/>
         <FILE id="WZRYSi" name="DetailsComponent.cpp" compile="1" resource="0"
               file="Source/Components/DetailsComponent.cpp"/>
         <FILE id="VgI3cm" name="DetailsComponent.h" compile="0" resource="0"

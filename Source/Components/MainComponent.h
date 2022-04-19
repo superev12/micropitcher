@@ -22,7 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
 #include "ToolbarComponent.h"
-#include "GraphComponent.h"
+#include "GraphContainerComponent.h"
 #include "DetailsComponent.h"
 //[/Headers]
 
@@ -57,9 +57,9 @@ private:
     juce::ValueTree valueTree;
 
     ToolbarComponent toolbarComponent;
-    GraphComponent graphComponent;
+    GraphContainerComponent graphContainerComponent;
     DetailsComponent detailsComponent;
-        
+
     //[/UserVariables]
 
     //==============================================================================
