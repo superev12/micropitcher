@@ -24,19 +24,40 @@
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
+#include "../TreeValues.h"
+#include "GraphHelper.h"
 //[/MiscUserDefs]
 
 //==============================================================================
-GraphComponent::GraphComponent ()
+GraphComponent::GraphComponent (juce::ValueTree& state) : valueTree(state)
 {
     //[Constructor_pre] You can add your own custom stuff here..
+    // Add ValueTree for graph
+    juce::ValueTree graphState (TreeValues::graphIdentifier);
+    valueTree.addChild(graphState, -1, nullptr);
+
+    // Add Test path to graph valueTree
+
+    juce::ValueTree pathTree1 (TreeValues::pathTreeIdentifier);
+    pathTree1.setProperty(TreeValues::pathStringIdentifier, "a m 274.9234 204 c 312 178 320 218 368 202 432 186 472 242 362 292", nullptr);
+    valueTree.getChildWithName(TreeValues::graphIdentifier).addChild(pathTree1, 0, nullptr);
+
+    juce::ValueTree pathTree2 (TreeValues::pathTreeIdentifier);
+    pathTree2.setProperty(TreeValues::pathStringIdentifier, "a m 10 10", nullptr);
+    valueTree.getChildWithName(TreeValues::graphIdentifier).addChild(pathTree2, 1, nullptr);
+
+    readPathsFromValueTree();
+
+    //graphHelper::getNumberOfNodes(pathStrings[0]);
     //[/Constructor_pre]
 
+    /*
     internalPath1.setUsingNonZeroWinding (false);
     internalPath1.startNewSubPath (274.0f, 204.0f);
     internalPath1.cubicTo (312.0f, 178.0f, 320.0f, 218.0f, 368.0f, 202.0f);
     internalPath1.cubicTo (432.0f, 186.0f, 472.0f, 242.0f, 362.0f, 292.0f);
     internalPath1.lineTo (234.0f, 342.0f);
+    */
 
 
     //[UserPreSize]
@@ -68,6 +89,7 @@ void GraphComponent::paint (juce::Graphics& g)
 
     g.fillAll (juce::Colour (0xff323e44));
 
+    /*
     {
         float x = 244.0f, y = 220.0f, width = 100.0f, height = 100.0f;
         juce::Colour fillColour = juce::Colour (0xffa52aa4);
@@ -85,8 +107,28 @@ void GraphComponent::paint (juce::Graphics& g)
         g.setColour (strokeColour);
         g.strokePath (internalPath1, juce::PathStrokeType (5.000f), juce::AffineTransform::translation(x, y));
     }
+    */
 
     //[UserPaint] Add your own custom painting code here..
+    int numberOfPaths = pathStrings.size();
+    for (int i = 0; i < numberOfPaths; i++)
+    {
+        juce::Path path;
+        path.restoreFromString(pathStrings[i]);
+        juce::Colour strokeColour = juce::Colour (0xff4ea52a);
+        g.setColour (strokeColour);
+        g.strokePath (path, juce::PathStrokeType (5.000f), juce::AffineTransform::translation(0.0f, 0.0f));
+
+        // Also draw circles at the nodes on the path
+        auto nodePositions = graphHelper::getNodePositions(pathStrings[i]);
+        for (int j = 0; j < nodePositions.size(); j++)
+        {
+            auto nodePosition = nodePositions[j];
+            g.drawEllipse(nodePosition.x, nodePosition.y, 10.0f, 10.0f, 5.0f);
+        }
+    }
+
+
     //[/UserPaint]
 }
 
@@ -102,6 +144,36 @@ void GraphComponent::resized()
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void GraphComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& id)
+{
+
+}
+
+void GraphComponent::readPathsFromValueTree()
+{
+    pathStrings = {};
+
+    int numberOfPaths = valueTree.getChildWithName(TreeValues::graphIdentifier).getNumChildren();
+    for (int i = 0; i < numberOfPaths; i++)
+    {
+        pathStrings.push_back(valueTree.getChildWithName(TreeValues::graphIdentifier).getChild(i).getProperty(TreeValues::pathStringIdentifier));
+    }
+}
+
+void GraphComponent::writePathsToValueTree()
+{
+    valueTree.getChildWithName(TreeValues::graphIdentifier).removeAllChildren(nullptr);
+
+    int numberOfPaths = pathStrings.size();
+    for (int i = 0; i < numberOfPaths; i++)
+    {
+        juce::ValueTree pathTree (TreeValues::pathTreeIdentifier);
+        pathTree.setProperty(TreeValues::pathStringIdentifier, pathStrings[i], nullptr);
+        valueTree.getChildWithName(TreeValues::graphIdentifier).addChild(pathTree, i, nullptr);
+    }
+}
+
+
 //[/MiscUserCode]
 
 

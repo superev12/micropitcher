@@ -24,7 +24,6 @@
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
-#include "GraphComponent.h"
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -36,7 +35,7 @@ GraphContainerComponent::GraphContainerComponent (juce::ValueTree& state) : valu
     juce__viewport.reset (new juce::Viewport ("new viewport"));
     addAndMakeVisible (juce__viewport.get());
     juce__viewport->setScrollBarsShown (true, true);
-    juce__viewport->setViewedComponent (new GraphComponent());
+    juce__viewport->setViewedComponent (new GraphComponent(valueTree));
 
 
     //[UserPreSize]
@@ -90,16 +89,6 @@ void GraphContainerComponent::resized()
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void GraphContainerComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& id)
 {
-    static juce::Identifier propertyName("button");
-    if ((bool) valueTree[id]) {
-        DBG("valueTree change triggered to green");
-        backgroundColour = juce::Colours::green;
-        this->repaint();
-    } else {
-        DBG("valueTree change triggered to purple");
-        backgroundColour = juce::Colours::purple;
-        this->repaint();
-    }
 }
 //[/MiscUserCode]
 
