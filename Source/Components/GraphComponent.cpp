@@ -124,7 +124,7 @@ void GraphComponent::paint (juce::Graphics& g)
         for (int j = 0; j < nodePositions.size(); j++)
         {
             auto nodePosition = nodePositions[j];
-            g.drawEllipse(nodePosition.x, nodePosition.y, 10.0f, 10.0f, 5.0f);
+            drawNodePoint(g, nodePosition);
         }
     }
 
@@ -173,7 +173,13 @@ void GraphComponent::writePathsToValueTree()
     }
 }
 
-
+void GraphComponent::drawNodePoint(juce::Graphics& g, juce::Point<float> point)
+{
+    g.setColour (juce::Colour(0xff323e44));
+    g.fillEllipse(point.x - 5.0f, point.y - 5.0f, 10.0f, 10.0f);
+    g.setColour (juce::Colour (0xff4ea52a));
+    g.drawEllipse(point.x - 5.0f, point.y - 5.0f, 10.0f, 10.0f, 5.0f);
+}
 //[/MiscUserCode]
 
 

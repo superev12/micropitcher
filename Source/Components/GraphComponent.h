@@ -58,6 +58,7 @@ private:
     juce::ValueTree valueTree;
     InteractionState interactionState = NEUTRAL;
     std::vector<juce::String> pathStrings;
+    void drawNodePoint(juce::Graphics& g, juce::Point<float>);
     //[/UserVariables]
 
     //==============================================================================
