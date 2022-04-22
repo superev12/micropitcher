@@ -50,6 +50,12 @@ public:
 
     void paint (juce::Graphics& g) override;
     void resized() override;
+    void moved() override;
+    void mouseDown (const juce::MouseEvent& e) override;
+    void mouseDrag (const juce::MouseEvent& e) override;
+    void mouseUp (const juce::MouseEvent& e) override;
+    void mouseWheelMove (const juce::MouseEvent& e, const juce::MouseWheelDetails& wheel) override;
+    void modifierKeysChanged (const juce::ModifierKeys& modifiers) override;
 
 
 
@@ -59,6 +65,13 @@ private:
     InteractionState interactionState = NEUTRAL;
     std::vector<juce::String> pathStrings;
     void drawNodePoint(juce::Graphics& g, juce::Point<float>);
+
+    int grabbedPathIndex;
+    int grabbedNodeIndex;
+
+    const float pointHandleRadius = 5.0f;
+    const float pointHandleDiameter = pointHandleRadius * 2;
+    const float pointHandleStrokeWeight = 5.0f;
     //[/UserVariables]
 
     //==============================================================================

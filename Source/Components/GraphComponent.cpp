@@ -89,7 +89,6 @@ void GraphComponent::paint (juce::Graphics& g)
 
     g.fillAll (juce::Colour (0xff323e44));
 
-    /*
     {
         float x = 244.0f, y = 220.0f, width = 100.0f, height = 100.0f;
         juce::Colour fillColour = juce::Colour (0xffa52aa4);
@@ -107,7 +106,6 @@ void GraphComponent::paint (juce::Graphics& g)
         g.setColour (strokeColour);
         g.strokePath (internalPath1, juce::PathStrokeType (5.000f), juce::AffineTransform::translation(x, y));
     }
-    */
 
     //[UserPaint] Add your own custom painting code here..
     int numberOfPaths = pathStrings.size();
@@ -139,6 +137,84 @@ void GraphComponent::resized()
 
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
+}
+
+void GraphComponent::moved()
+{
+    //[UserCode_moved] -- Add your code here...
+    //[/UserCode_moved]
+}
+
+void GraphComponent::mouseDown (const juce::MouseEvent& e)
+{
+    //[UserCode_mouseDown] -- Add your code here...
+
+    auto mousePoint = e.getPosition().toFloat();
+
+    // get node clicked
+    for (int pathIndex = 0; pathIndex < pathStrings.size(); pathIndex++)
+    {
+        auto pathString = pathStrings[pathIndex];
+        auto nodePositions = graphHelper::getNodePositions(pathString);
+
+        for (int nodeIndex = 0; nodeIndex < nodePositions.size(); nodeIndex++)
+        {
+            if (nodePositions[nodeIndex].getDistanceFrom(mousePoint) < pointHandleRadius+pointHandleStrokeWeight/2)
+            {
+                grabbedPathIndex = pathIndex;
+                grabbedNodeIndex = nodeIndex;
+            }
+        }
+    }
+
+    interactionState = DRAGGING;
+
+    
+    //pathStrings[0] = graphHelper::moveNode(pathStrings[0], 0, e.getPosition().toFloat());
+
+    repaint();
+    //[/UserCode_mouseDown]
+}
+
+void GraphComponent::mouseDrag (const juce::MouseEvent& e)
+{
+    //[UserCode_mouseDrag] -- Add your code here...
+    if (grabbedPathIndex == -1 || grabbedNodeIndex == -1) return;
+
+    auto mousePoint = e.getPosition().toFloat();
+
+    pathStrings[grabbedPathIndex] = graphHelper::moveNode(
+        pathStrings[grabbedPathIndex],
+        grabbedNodeIndex,
+        mousePoint
+    );
+
+    repaint();
+    //[/UserCode_mouseDrag]
+}
+
+void GraphComponent::mouseUp (const juce::MouseEvent& e)
+{
+    //[UserCode_mouseUp] -- Add your code here...
+    interactionState = NEUTRAL;
+
+    grabbedPathIndex = -1;
+    grabbedNodeIndex = -1;
+
+    writePathsToValueTree();
+    //[/UserCode_mouseUp]
+}
+
+void GraphComponent::mouseWheelMove (const juce::MouseEvent& e, const juce::MouseWheelDetails& wheel)
+{
+    //[UserCode_mouseWheelMove] -- Add your code here...
+    //[/UserCode_mouseWheelMove]
+}
+
+void GraphComponent::modifierKeysChanged (const juce::ModifierKeys& modifiers)
+{
+    //[UserCode_modifierKeysChanged] -- Add your code here...
+    //[/UserCode_modifierKeysChanged]
 }
 
 
@@ -176,9 +252,9 @@ void GraphComponent::writePathsToValueTree()
 void GraphComponent::drawNodePoint(juce::Graphics& g, juce::Point<float> point)
 {
     g.setColour (juce::Colour(0xff323e44));
-    g.fillEllipse(point.x - 5.0f, point.y - 5.0f, 10.0f, 10.0f);
+    g.fillEllipse(point.x - pointHandleRadius, point.y - pointHandleRadius, pointHandleDiameter, pointHandleDiameter);
     g.setColour (juce::Colour (0xff4ea52a));
-    g.drawEllipse(point.x - 5.0f, point.y - 5.0f, 10.0f, 10.0f, 5.0f);
+    g.drawEllipse(point.x - pointHandleRadius, point.y - pointHandleRadius, pointHandleDiameter, pointHandleDiameter, pointHandleStrokeWeight);
 }
 //[/MiscUserCode]
 
@@ -196,6 +272,14 @@ BEGIN_JUCER_METADATA
                  parentClasses="public juce::Component" constructorParams="" variableInitialisers=""
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
+  <METHODS>
+    <METHOD name="mouseDown (const juce::MouseEvent&amp; e)"/>
+    <METHOD name="mouseDrag (const juce::MouseEvent&amp; e)"/>
+    <METHOD name="mouseUp (const juce::MouseEvent&amp; e)"/>
+    <METHOD name="mouseWheelMove (const juce::MouseEvent&amp; e, const juce::MouseWheelDetails&amp; wheel)"/>
+    <METHOD name="modifierKeysChanged (const juce::ModifierKeys&amp; modifiers)"/>
+    <METHOD name="moved()"/>
+  </METHODS>
   <BACKGROUND backgroundColour="ff323e44">
     <ROUNDRECT pos="244 220 100 100" cornerSize="10.0" fill="solid: ffa52aa4"
                hasStroke="0"/>

@@ -108,7 +108,7 @@ BEGIN_JUCER_METADATA
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <VIEWPORT name="new viewport" id="1b7864cd13d512e6" memberName="juce__viewport"
-            virtualName="" explicitFocusOrder="0" pos="0.5Cc -2Cc 20M 20M"
+            virtualName="" explicitFocusOrder="0" pos="0Cc -1.5Cc 20M 20M"
             vscroll="0" hscroll="0" scrollbarThickness="8" contentType="2"
             jucerFile="" contentClass="GraphComponent" constructorParams=""/>
 </JUCER_COMPONENT>

@@ -2,17 +2,11 @@
 
 namespace graphHelper
 {
-
-    struct Point {
-        float x;
-        float y;
-    };
-    
     struct Node
     {
-        Point point;
-        Point handleL;
-        Point handleR;
+        juce::Point<float> point;
+        juce::Point<float> handleL;
+        juce::Point<float> handleR;
     };
 
     std::vector<juce::String>splitString(juce::String& string, char splitChar)
@@ -26,10 +20,6 @@ namespace graphHelper
         while (true)
         {
             int splitIndex = remainingString.indexOfChar(splitChar);
-            //printf("\nsplitIndex %n \nremainingString %n \nsplitStrings %n \n", splitIndex, remainingString, splitStrings);
-            DBG(juce::String("splitIndex") + juce::String(splitIndex));
-            //DBG(juce::String("splitString") + juce::String(splitString));
-            DBG(juce::String("remainingString") + juce::String(remainingString));
             if (splitIndex == -1)
             {
                 // There was no space in the string
@@ -59,7 +49,6 @@ namespace graphHelper
         std::vector<Node> nodeArray = {};
 
         auto splitValues = splitString(pathString, ' ');
-        DBG("strings have been splitted");
         if (splitValues[0] != "a") return {};
         if (splitValues[1] != "m") return {};
         const float originX = splitValues[2].getFloatValue();
@@ -70,9 +59,9 @@ namespace graphHelper
             // path is a single point
             nodeArray.push_back(
                 {
-                    .point = {.x=originX, .y=originY},
-                    .handleL = {.x=originX, .y=originY},
-                    .handleR = {.x=originX, .y=originY},
+                    .point = juce::Point<float>(originX, originY),
+                    .handleL = juce::Point<float>(originX, originY),
+                    .handleR = juce::Point<float>(originX, originY),
                 }
             );
             return nodeArray;
@@ -85,9 +74,9 @@ namespace graphHelper
         // first point in path (has no left handle)
         nodeArray.push_back(
                 {
-                    .point = {.x = originX, .y = originY},
-                    .handleL = {.x = originX, .y = originY},
-                    .handleR = {.x = originRHandleX, .y = originRHandleY},
+                    .point = juce::Point<float>( originX,  originY),
+                    .handleL = juce::Point<float>( originX,  originY),
+                    .handleR = juce::Point<float>( originRHandleX,  originRHandleY),
                 }
         );
 
@@ -103,9 +92,9 @@ namespace graphHelper
             const float currentRHandleY = splitValues[nodeStartIndex+5].getFloatValue();
             nodeArray.push_back(
                 {
-                    .point = {.x = currentPointX, .y = currentPointY},
-                    .handleL = {.x = currentLHandleX, .y = currentLHandleY},
-                    .handleR = {.x = currentRHandleX, .y = currentRHandleY},
+                    .point = juce::Point<float>( currentPointX,  currentPointY),
+                    .handleL = juce::Point<float>( currentLHandleX,  currentLHandleY),
+                    .handleR = juce::Point<float>( currentRHandleX,  currentRHandleY),
                 }
             );
             nodeStartIndex += 6;
@@ -119,14 +108,63 @@ namespace graphHelper
         
         nodeArray.push_back(
             {
-                .point = {.x = lastPointX, .y = lastPointY},
-                .handleL = {.x = lastLHandleX, .y = lastLHandleY},
-                .handleR = {.x = lastPointX, .y = lastPointY},
+                .point = juce::Point<float>( lastPointX,  lastPointY),
+                .handleL = juce::Point<float>( lastLHandleX,  lastLHandleY),
+                .handleR = juce::Point<float>( lastPointX,  lastPointY),
             }
         );
         
         
         return nodeArray;
+    }
+
+    juce::String nodeArrayToString(std::vector<Node> nodeArray)
+    {
+        juce::String pathString ("");
+        
+        auto firstNode = nodeArray[0];
+        pathString += juce::String("a m ");
+        pathString += juce::String(firstNode.point.x);
+        pathString += juce::String(" ");
+        pathString += juce::String(firstNode.point.y);
+
+        if (nodeArray.size() == 1) return pathString;
+
+        pathString += juce::String(" c ");
+        pathString += juce::String(firstNode.handleR.x);
+        pathString += juce::String(" ");
+        pathString += juce::String(firstNode.handleR.y);
+        pathString += juce::String(" ");
+
+        for (int i = 1; i < nodeArray.size() - 1; i++)
+        {
+            auto currentNode = nodeArray[i];
+
+            pathString += juce::String(currentNode.handleL.x);
+            pathString += juce::String(" ");
+            pathString += juce::String(currentNode.handleL.y);
+            pathString += juce::String(" ");
+            pathString += juce::String(currentNode.point.x);
+            pathString += juce::String(" ");
+            pathString += juce::String(currentNode.point.y);
+            pathString += juce::String(" ");
+            pathString += juce::String(currentNode.handleR.x);
+            pathString += juce::String(" ");
+            pathString += juce::String(currentNode.handleR.y);
+            pathString += juce::String(" ");
+        }
+
+        auto lastNode = nodeArray[nodeArray.size() - 1];
+
+        pathString += juce::String(lastNode.handleL.x);
+        pathString += juce::String(" ");
+        pathString += juce::String(lastNode.handleL.y);
+        pathString += juce::String(" ");
+        pathString += juce::String(lastNode.point.x);
+        pathString += juce::String(" ");
+        pathString += juce::String(lastNode.point.y);
+
+        return pathString;
     }
 
     // Test cases
@@ -172,6 +210,22 @@ namespace graphHelper
             );
         }
         return points;
+    }
+
+
+    // Test cases
+    // `a m 123 456`, `0`, `(123, 432)` -> `a m 123 432`
+    // `a m 123 456`, `1`, `(123, 432)` -> `a m 123 456`
+    // `a m 123 456 c 123 456 789 123 456 789`, `1`, `(0, 0)` -> `a m 123 456 c 123 456 789 123 0 0`
+    // `a m 123 456 c 123 456 789 123 456 789 123 456 789 123 999 111` -> `(123, 456), (456, 789), (999, 111)`
+    // `a m 123 456 c 123 456 789 123 456 789 123` -> `-1`
+    // `123 456 c 123 456 789 123 456 789` -> `-1`
+    juce::String moveNode(juce::String& pathString, int nodeIndex, juce::Point<float> newPosition)
+    {
+        std::vector<Node> nodeArray = stringToNodeArray(pathString);
+        nodeArray[nodeIndex].point.x = newPosition.x;
+        nodeArray[nodeIndex].point.y = newPosition.y;
+        return nodeArrayToString(nodeArray);
     }
 }
 
