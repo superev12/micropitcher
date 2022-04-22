@@ -223,8 +223,16 @@ namespace graphHelper
     juce::String moveNode(juce::String& pathString, int nodeIndex, juce::Point<float> newPosition)
     {
         std::vector<Node> nodeArray = stringToNodeArray(pathString);
-        nodeArray[nodeIndex].point.x = newPosition.x;
-        nodeArray[nodeIndex].point.y = newPosition.y;
+        auto oldPosition = nodeArray[nodeIndex].point;
+        auto difference = newPosition - oldPosition;
+
+        // Move point
+        nodeArray[nodeIndex].point = newPosition;
+
+        // Move handles with point
+        nodeArray[nodeIndex].handleL += difference;
+        nodeArray[nodeIndex].handleR += difference;
+
         return nodeArrayToString(nodeArray);
     }
 

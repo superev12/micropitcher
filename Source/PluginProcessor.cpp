@@ -5,6 +5,7 @@
 
   ==============================================================================
 */
+#include <cmath>
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
@@ -134,6 +135,14 @@ void MicropitcherAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    double time = std::fmod(juce::Time::getMillisecondCounterHiRes(), 1000.0);
+
+    int noteNumber = (int) (time/100 + 50);
+    auto messageOn = juce::MidiMessage::noteOn (0, noteNumber, (juce::uint8) 100);
+    auto messageOff = juce::MidiMessage::noteOff (0, noteNumber, (juce::uint8) 100);
+    midiMessages.addEvent(messageOn, 0);
+    midiMessages.addEvent(messageOff, 0);
+
 
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
