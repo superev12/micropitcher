@@ -118,12 +118,29 @@ void GraphComponent::paint (juce::Graphics& g)
         g.strokePath (path, juce::PathStrokeType (5.000f), juce::AffineTransform::translation(0.0f, 0.0f));
 
         // Also draw circles at the nodes on the path
+        /*
         auto nodePositions = graphHelper::getNodePositions(pathStrings[i]);
         for (int j = 0; j < nodePositions.size(); j++)
         {
             auto nodePosition = nodePositions[j];
             drawNodePoint(g, nodePosition);
         }
+        */
+
+        auto nodeArray = graphHelper::stringToNodeArray(pathStrings[i]);
+
+        for (int j = 0; j < nodeArray.size(); j++)
+        {
+            auto nodePosition = nodeArray[j].point;
+            auto nodeHandleLPosition = nodeArray[j].handleL;
+            auto nodeHandleRPosition = nodeArray[j].handleR;
+
+            drawNodeHandle(g, nodePosition, nodeHandleLPosition);
+            drawNodeHandle(g, nodePosition, nodeHandleRPosition);
+            drawNodePoint(g, nodePosition);
+        }
+
+
     }
 
 
@@ -155,14 +172,43 @@ void GraphComponent::mouseDown (const juce::MouseEvent& e)
     for (int pathIndex = 0; pathIndex < pathStrings.size(); pathIndex++)
     {
         auto pathString = pathStrings[pathIndex];
-        auto nodePositions = graphHelper::getNodePositions(pathString);
+        auto nodeArray = graphHelper::stringToNodeArray(pathString);
 
-        for (int nodeIndex = 0; nodeIndex < nodePositions.size(); nodeIndex++)
+        for (int nodeIndex = 0; nodeIndex < nodeArray.size(); nodeIndex++)
         {
-            if (nodePositions[nodeIndex].getDistanceFrom(mousePoint) < pointHandleRadius+pointHandleStrokeWeight/2)
+            if
+            (
+                nodeArray[nodeIndex].point.getDistanceFrom(mousePoint)
+                    <
+                pointHandleRadius+pointHandleStrokeWeight/2
+            )
             {
                 grabbedPathIndex = pathIndex;
                 grabbedNodeIndex = nodeIndex;
+                grabbedHandleType = handleType::NODE;
+                //DBG(juce::String::formatted("setting grabbedHandleType to %i", grabbedHandleType));
+            }
+            else if
+            (
+                nodeArray[nodeIndex].handleL.getDistanceFrom(mousePoint)
+                    <
+                pointHandleRadius+pointHandleStrokeWeight/2
+            )
+            {
+                grabbedPathIndex = pathIndex;
+                grabbedNodeIndex = nodeIndex;
+                grabbedHandleType = handleType::LEFT;
+            }
+            else if
+            (
+                nodeArray[nodeIndex].handleR.getDistanceFrom(mousePoint)
+                    <
+                pointHandleRadius+pointHandleStrokeWeight/2
+            )
+            {
+                grabbedPathIndex = pathIndex;
+                grabbedNodeIndex = nodeIndex;
+                grabbedHandleType = handleType::RIGHT;
             }
         }
     }
@@ -183,11 +229,32 @@ void GraphComponent::mouseDrag (const juce::MouseEvent& e)
 
     auto mousePoint = e.getPosition().toFloat();
 
-    pathStrings[grabbedPathIndex] = graphHelper::moveNode(
-        pathStrings[grabbedPathIndex],
-        grabbedNodeIndex,
-        mousePoint
-    );
+    DBG(juce::String::formatted("moving node %i, handle %i", grabbedNodeIndex, grabbedHandleType));
+    switch(grabbedHandleType)
+    {
+    case handleType::NODE:
+        DBG(juce::String::formatted("moving node %i", grabbedNodeIndex));
+        pathStrings[grabbedPathIndex] = graphHelper::moveNode(
+            pathStrings[grabbedPathIndex],
+            grabbedNodeIndex,
+            mousePoint
+        );
+        break;
+    case handleType::LEFT:
+        pathStrings[grabbedPathIndex] = graphHelper::moveNodeHandleL(
+            pathStrings[grabbedPathIndex],
+            grabbedNodeIndex,
+            mousePoint
+        );
+        break;
+    case handleType::RIGHT:
+        pathStrings[grabbedPathIndex] = graphHelper::moveNodeHandleR(
+            pathStrings[grabbedPathIndex],
+            grabbedNodeIndex,
+            mousePoint
+        );
+        break;
+    }
 
     repaint();
     //[/UserCode_mouseDrag]
@@ -255,6 +322,13 @@ void GraphComponent::drawNodePoint(juce::Graphics& g, juce::Point<float> point)
     g.fillEllipse(point.x - pointHandleRadius, point.y - pointHandleRadius, pointHandleDiameter, pointHandleDiameter);
     g.setColour (juce::Colour (0xff4ea52a));
     g.drawEllipse(point.x - pointHandleRadius, point.y - pointHandleRadius, pointHandleDiameter, pointHandleDiameter, pointHandleStrokeWeight);
+}
+
+void GraphComponent::drawNodeHandle(juce::Graphics& g, juce::Point<float> originPoint, juce::Point<float> handlePoint)
+{
+    juce::Line<float> handleLine (originPoint, handlePoint);
+    g.drawLine(handleLine, handleLineStrokeWeight);
+    drawNodePoint(g, handlePoint);
 }
 //[/MiscUserCode]
 

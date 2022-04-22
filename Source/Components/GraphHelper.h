@@ -227,5 +227,21 @@ namespace graphHelper
         nodeArray[nodeIndex].point.y = newPosition.y;
         return nodeArrayToString(nodeArray);
     }
+
+    juce::String moveNodeHandleL(juce::String& pathString, int nodeIndex, juce::Point<float> newPosition)
+    {
+        std::vector<Node> nodeArray = stringToNodeArray(pathString);
+        nodeArray[nodeIndex].handleL.x = newPosition.x;
+        nodeArray[nodeIndex].handleL.y = newPosition.y;
+        return nodeArrayToString(nodeArray);
+    }
+
+    juce::String moveNodeHandleR(juce::String& pathString, int nodeIndex, juce::Point<float> newPosition)
+    {
+        std::vector<Node> nodeArray = stringToNodeArray(pathString);
+        nodeArray[nodeIndex].handleR.x = newPosition.x;
+        nodeArray[nodeIndex].handleR.y = newPosition.y;
+        return nodeArrayToString(nodeArray);
+    }
 }
 

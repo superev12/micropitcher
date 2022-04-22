@@ -22,6 +22,8 @@
 //[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
 #include "interactionStates.h"
+
+enum class handleType {LEFT, NODE, RIGHT};
 //[/Headers]
 
 
@@ -65,13 +67,17 @@ private:
     InteractionState interactionState = NEUTRAL;
     std::vector<juce::String> pathStrings;
     void drawNodePoint(juce::Graphics& g, juce::Point<float>);
+    void drawNodeHandle(juce::Graphics& g, juce::Point<float>, juce::Point<float>);
 
-    int grabbedPathIndex;
-    int grabbedNodeIndex;
+    int grabbedPathIndex = -1;
+    int grabbedNodeIndex = -1;
+    handleType grabbedHandleType = handleType::NODE;
 
     const float pointHandleRadius = 5.0f;
     const float pointHandleDiameter = pointHandleRadius * 2;
     const float pointHandleStrokeWeight = 5.0f;
+
+    const float handleLineStrokeWeight = 2.0f;
     //[/UserVariables]
 
     //==============================================================================
