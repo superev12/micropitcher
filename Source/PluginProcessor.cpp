@@ -138,9 +138,37 @@ void MicropitcherAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
-    /*
-    double time = std::fmod(juce::Time::getMillisecondCounterHiRes(), 1000.0);
 
+    double timeNowInMilliseconds = std::fmod(juce::Time::getMillisecondCounterHiRes(), 1000.0);
+    deltaTimeInMilliseconds = timeNowInMilliseconds - timeThenInMilliseconds;
+
+    double timeAtLastUpdate = timeNowInMilliseconds - deltaTimeInMilliseconds;
+
+    int nextMessageIndex = cachedMidiSequence.getNextIndexAtTime(timeAtLastUpdate);
+
+    while (cachedMidiSequence.getEventTime(nextMessageIndex) < timeNowInMilliseconds)
+    {
+        auto currentMessagePointer = cachedMidiSequence.getEventPointer(nextMessageIndex);
+        auto currentMessageTimeInMilliseconds = cachedMidiSequence.getEventTime(nextMessageIndex);
+        auto currentMessage = currentMessagePointer->message;
+
+        if (currentMessageTimeInMilliseconds <= timeNowInMilliseconds)
+        {
+            midiMessages.addEvent(currentMessage, 0);
+        } else {
+            double sampleDurationInMilliseconds = 1000 / getSampleRate();
+            double howFarInTheFutureTheTheSampleIsInMilliseconds = currentMessageTimeInMilliseconds - timeNowInMilliseconds;
+            int sampleNumber = (int) howFarInTheFutureTheTheSampleIsInMilliseconds/sampleDurationInMilliseconds;
+            midiMessages.addEvent(currentMessage, sampleNumber);
+        }
+
+        if (nextMessageIndex == cachedMidiSequence.getNumEvents() - 1) break;
+
+        nextMessageIndex++;
+    }
+    //DBG(juce::String(midiMessages));
+
+    /*
     int noteNumber = (int) (time/100 + 50);
     auto messageOn = juce::MidiMessage::noteOn (0, noteNumber, (juce::uint8) 100);
     auto messageOff = juce::MidiMessage::noteOff (0, noteNumber, (juce::uint8) 100);
@@ -208,16 +236,31 @@ void MicropitcherAudioProcessor::valueTreeChildAdded(juce::ValueTree& parentTree
 {
     if (childTree.getType() == TreeValues::graphIdentifier)
     {
-        DBG("graph identifier changed");
-        //pathStringsChanged();
     } else if (childTree.getType() == TreeValues::pathTreeIdentifier) {
-        DBG("path identifier changed");
+        pathStringsChanged();
     }
+}
+
+std::vector<juce::String> MicropitcherAudioProcessor::readPathStringsFromValueTree()
+{
+    std::vector<juce::String> pathStrings = {};
+    auto graphTree = valueTree.getChildWithName(TreeValues::graphIdentifier);
+    for (int i = 0; i < graphTree.getNumChildren(); i++)
+    {
+        pathStrings.push_back(
+            graphTree.getChild(i)
+                .getProperty(TreeValues::pathStringIdentifier)
+                .toString()
+        );
+    }
+    return pathStrings;
 }
 
 void MicropitcherAudioProcessor::pathStringsChanged()
 {
     DBG("The path strings were changed");
+    std::vector<juce::String> pathStrings = readPathStringsFromValueTree();
+    cachedMidiSequence = renderPathstringsToMidiSequence(pathStrings);
 }
 
 // This creates new instances of the plugin..

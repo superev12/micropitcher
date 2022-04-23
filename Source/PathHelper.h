@@ -1,6 +1,8 @@
+#pragma once
+
 #include <JuceHeader.h>
 
-namespace graphHelper
+namespace pathHelper
 {
     struct Node
     {
@@ -9,7 +11,10 @@ namespace graphHelper
         juce::Point<float> handleR;
     };
 
-    std::vector<juce::String>splitString(juce::String& string, char splitChar)
+    typedef std::vector<Node> NodeArray ;
+
+
+    static std::vector<juce::String>splitString(juce::String& string, char splitChar)
     {
         auto remainingString = string;
         std::vector<juce::String> splitStrings = {};
@@ -44,9 +49,9 @@ namespace graphHelper
     }
 
 
-    std::vector<Node> stringToNodeArray(juce::String& pathString)
+    static NodeArray stringToNodeArray(juce::String& pathString)
     {
-        std::vector<Node> nodeArray = {};
+        NodeArray nodeArray = {};
 
         auto splitValues = splitString(pathString, ' ');
         if (splitValues[0] != "a") return {};
@@ -118,7 +123,7 @@ namespace graphHelper
         return nodeArray;
     }
 
-    juce::String nodeArrayToString(std::vector<Node> nodeArray)
+    static juce::String nodeArrayToString(NodeArray nodeArray)
     {
         juce::String pathString ("");
         
@@ -173,9 +178,9 @@ namespace graphHelper
     // `a m 123 456 c 123 456 789 123 456 789 123 456 789 123 456 789` -> `3`
     // `a m 123 456 c 123 456 789 123 456 789 123` -> `-1`
     // `123 456 c 123 456 789 123 456 789` -> `-1`
-    int getNumberOfNodes(juce::String& pathString)
+    static int getNumberOfNodes(juce::String& pathString)
     {
-        std::vector<Node> nodeArray = stringToNodeArray(pathString);
+        NodeArray nodeArray = stringToNodeArray(pathString);
 
         return nodeArray.size();
     }
@@ -185,9 +190,9 @@ namespace graphHelper
     // `a m 123 456 c 123 456 789 123 456 789 123 456 789 123 456 789`, `7` -> `undefined?`
     // `a m 123 456 c 123 456 789 123 456 789 123` -> `undefined?`
     // `123 456 c 123 456 789 123 456 789` -> `undefined?`
-    juce::Point<float> getNodePosition(juce::String& pathString, int index)
+    static juce::Point<float> getNodePosition(juce::String& pathString, int index)
     {
-        std::vector<Node> nodeArray = stringToNodeArray(pathString);
+        NodeArray nodeArray = stringToNodeArray(pathString);
         auto nodeAtIndex = nodeArray[index];
         return juce::Point<float>(nodeAtIndex.point.x, nodeAtIndex.point.y);
     }
@@ -198,10 +203,10 @@ namespace graphHelper
     // `a m 123 456 c 123 456 789 123 456 789 123 456 789 123 999 111` -> `(123, 456), (456, 789), (999, 111)`
     // `a m 123 456 c 123 456 789 123 456 789 123` -> `-1`
     // `123 456 c 123 456 789 123 456 789` -> `-1`
-    std::vector<juce::Point<float>> getNodePositions(juce::String& pathString)
+    static std::vector<juce::Point<float>> getNodePositions(juce::String& pathString)
     {
         std::vector<juce::Point<float>> points;
-        std::vector<Node> nodeArray = stringToNodeArray(pathString);
+        NodeArray nodeArray = stringToNodeArray(pathString);
         
         for (int i = 0; i < nodeArray.size(); i++)
         {
@@ -220,9 +225,9 @@ namespace graphHelper
     // `a m 123 456 c 123 456 789 123 456 789 123 456 789 123 999 111` -> `(123, 456), (456, 789), (999, 111)`
     // `a m 123 456 c 123 456 789 123 456 789 123` -> `-1`
     // `123 456 c 123 456 789 123 456 789` -> `-1`
-    juce::String moveNode(juce::String& pathString, int nodeIndex, juce::Point<float> newPosition)
+    static juce::String moveNode(juce::String& pathString, int nodeIndex, juce::Point<float> newPosition)
     {
-        std::vector<Node> nodeArray = stringToNodeArray(pathString);
+        NodeArray nodeArray = stringToNodeArray(pathString);
         auto oldPosition = nodeArray[nodeIndex].point;
         auto difference = newPosition - oldPosition;
 
@@ -236,17 +241,17 @@ namespace graphHelper
         return nodeArrayToString(nodeArray);
     }
 
-    juce::String moveNodeHandleL(juce::String& pathString, int nodeIndex, juce::Point<float> newPosition)
+    static juce::String moveNodeHandleL(juce::String& pathString, int nodeIndex, juce::Point<float> newPosition)
     {
-        std::vector<Node> nodeArray = stringToNodeArray(pathString);
+        NodeArray nodeArray = stringToNodeArray(pathString);
         nodeArray[nodeIndex].handleL.x = newPosition.x;
         nodeArray[nodeIndex].handleL.y = newPosition.y;
         return nodeArrayToString(nodeArray);
     }
 
-    juce::String moveNodeHandleR(juce::String& pathString, int nodeIndex, juce::Point<float> newPosition)
+    static juce::String moveNodeHandleR(juce::String& pathString, int nodeIndex, juce::Point<float> newPosition)
     {
-        std::vector<Node> nodeArray = stringToNodeArray(pathString);
+        NodeArray nodeArray = stringToNodeArray(pathString);
         nodeArray[nodeIndex].handleR.x = newPosition.x;
         nodeArray[nodeIndex].handleR.y = newPosition.y;
         return nodeArrayToString(nodeArray);

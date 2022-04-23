@@ -25,7 +25,7 @@
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 #include "../TreeValues.h"
-#include "GraphHelper.h"
+#include "../PathHelper.h"
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -50,7 +50,6 @@ GraphComponent::GraphComponent (juce::ValueTree& state) : valueTree(state)
 
     readPathsFromValueTree();
 
-    //graphHelper::getNumberOfNodes(pathStrings[0]);
     //[/Constructor_pre]
 
     /*
@@ -119,17 +118,7 @@ void GraphComponent::paint (juce::Graphics& g)
         g.setColour (strokeColour);
         g.strokePath (path, juce::PathStrokeType (5.000f), juce::AffineTransform::translation(0.0f, 0.0f));
 
-        // Also draw circles at the nodes on the path
-        /*
-        auto nodePositions = graphHelper::getNodePositions(pathStrings[i]);
-        for (int j = 0; j < nodePositions.size(); j++)
-        {
-            auto nodePosition = nodePositions[j];
-            drawNodePoint(g, nodePosition);
-        }
-        */
-
-        auto nodeArray = graphHelper::stringToNodeArray(pathStrings[i]);
+        auto nodeArray = pathHelper::stringToNodeArray(pathStrings[i]);
 
         for (int j = 0; j < nodeArray.size(); j++)
         {
@@ -174,7 +163,7 @@ void GraphComponent::mouseDown (const juce::MouseEvent& e)
     for (int pathIndex = 0; pathIndex < pathStrings.size(); pathIndex++)
     {
         auto pathString = pathStrings[pathIndex];
-        auto nodeArray = graphHelper::stringToNodeArray(pathString);
+        auto nodeArray = pathHelper::stringToNodeArray(pathString);
 
         for (int nodeIndex = 0; nodeIndex < nodeArray.size(); nodeIndex++)
         {
@@ -218,7 +207,7 @@ void GraphComponent::mouseDown (const juce::MouseEvent& e)
     interactionState = DRAGGING;
 
     
-    //pathStrings[0] = graphHelper::moveNode(pathStrings[0], 0, e.getPosition().toFloat());
+    //pathStrings[0] = pathHelper::moveNode(pathStrings[0], 0, e.getPosition().toFloat());
 
     repaint();
     //[/UserCode_mouseDown]
@@ -236,21 +225,21 @@ void GraphComponent::mouseDrag (const juce::MouseEvent& e)
     {
     case handleType::NODE:
         //DBG(juce::String::formatted("moving node %i", grabbedNodeIndex));
-        pathStrings[grabbedPathIndex] = graphHelper::moveNode(
+        pathStrings[grabbedPathIndex] = pathHelper::moveNode(
             pathStrings[grabbedPathIndex],
             grabbedNodeIndex,
             mousePoint
         );
         break;
     case handleType::LEFT:
-        pathStrings[grabbedPathIndex] = graphHelper::moveNodeHandleL(
+        pathStrings[grabbedPathIndex] = pathHelper::moveNodeHandleL(
             pathStrings[grabbedPathIndex],
             grabbedNodeIndex,
             mousePoint
         );
         break;
     case handleType::RIGHT:
-        pathStrings[grabbedPathIndex] = graphHelper::moveNodeHandleR(
+        pathStrings[grabbedPathIndex] = pathHelper::moveNodeHandleR(
             pathStrings[grabbedPathIndex],
             grabbedNodeIndex,
             mousePoint
@@ -308,7 +297,6 @@ void GraphComponent::readPathsFromValueTree()
 void GraphComponent::writePathsToValueTree()
 {
     auto graphTree = valueTree.getChildWithName(TreeValues::graphIdentifier);
-    //graphTree.removeAllChildren(nullptr);
 
     int numberOfPaths = pathStrings.size();
     for (int i = 0; i < numberOfPaths; i++)
@@ -324,7 +312,6 @@ void GraphComponent::writePathsToValueTree()
         graphTree.removeChild(i, nullptr);
         graphTree.addChild(pathTree, i, nullptr);
     }
-    DBG("writing them paths to the value tree");
 }
 
 void GraphComponent::drawNodePoint(juce::Graphics& g, juce::Point<float> point)

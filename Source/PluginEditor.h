@@ -1,7 +1,9 @@
 /*
   ==============================================================================
 
-    This file contains the basic framework code for a JUCE plugin editor.
+    PluginEditor.h
+    Created: 23 Apr 2022 7:39:41pm
+    Author:  evan
 
   ==============================================================================
 */

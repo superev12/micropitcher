@@ -56,6 +56,7 @@ public:
     //==============================================================================
     void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier&) override;
     void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override;
+    std::vector<juce::String> readPathStringsFromValueTree();
     void pathStringsChanged();
 
 private:
@@ -64,6 +65,10 @@ private:
             {"Parameter", {{"id", "button"}, {"value", false}}}
         }
     };
+
+    juce::MidiMessageSequence cachedMidiSequence;
+    double deltaTimeInMilliseconds;
+    double timeThenInMilliseconds;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MicropitcherAudioProcessor)
 };
