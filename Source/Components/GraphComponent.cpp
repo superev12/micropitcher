@@ -32,6 +32,8 @@
 GraphComponent::GraphComponent (juce::ValueTree& state) : valueTree(state)
 {
     //[Constructor_pre] You can add your own custom stuff here..
+    valueTree.addListener(this);
+
     // Add ValueTree for graph
     juce::ValueTree graphState (TreeValues::graphIdentifier);
     valueTree.addChild(graphState, -1, nullptr);
@@ -229,11 +231,11 @@ void GraphComponent::mouseDrag (const juce::MouseEvent& e)
 
     auto mousePoint = e.getPosition().toFloat();
 
-    DBG(juce::String::formatted("moving node %i, handle %i", grabbedNodeIndex, grabbedHandleType));
+    //DBG(juce::String::formatted("moving node %i, handle %i", grabbedNodeIndex, grabbedHandleType));
     switch(grabbedHandleType)
     {
     case handleType::NODE:
-        DBG(juce::String::formatted("moving node %i", grabbedNodeIndex));
+        //DBG(juce::String::formatted("moving node %i", grabbedNodeIndex));
         pathStrings[grabbedPathIndex] = graphHelper::moveNode(
             pathStrings[grabbedPathIndex],
             grabbedNodeIndex,
@@ -305,15 +307,24 @@ void GraphComponent::readPathsFromValueTree()
 
 void GraphComponent::writePathsToValueTree()
 {
-    valueTree.getChildWithName(TreeValues::graphIdentifier).removeAllChildren(nullptr);
+    auto graphTree = valueTree.getChildWithName(TreeValues::graphIdentifier);
+    //graphTree.removeAllChildren(nullptr);
 
     int numberOfPaths = pathStrings.size();
     for (int i = 0; i < numberOfPaths; i++)
     {
+        juce::String pathStringInValueTree = graphTree
+            .getChild(i)
+            .getProperty(TreeValues::pathStringIdentifier)
+            .toString();
+        if (pathStringInValueTree == pathStrings[i]) continue;
+
         juce::ValueTree pathTree (TreeValues::pathTreeIdentifier);
         pathTree.setProperty(TreeValues::pathStringIdentifier, pathStrings[i], nullptr);
-        valueTree.getChildWithName(TreeValues::graphIdentifier).addChild(pathTree, i, nullptr);
+        graphTree.removeChild(i, nullptr);
+        graphTree.addChild(pathTree, i, nullptr);
     }
+    DBG("writing them paths to the value tree");
 }
 
 void GraphComponent::drawNodePoint(juce::Graphics& g, juce::Point<float> point)

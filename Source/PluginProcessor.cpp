@@ -9,6 +9,8 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "MidiProcessor.h"
+#include "TreeValues.h"
 
 //==============================================================================
 MicropitcherAudioProcessor::MicropitcherAudioProcessor()
@@ -23,6 +25,7 @@ MicropitcherAudioProcessor::MicropitcherAudioProcessor()
                        )
 #endif
 {
+    valueTree.addListener(this);
 }
 
 MicropitcherAudioProcessor::~MicropitcherAudioProcessor()
@@ -135,6 +138,7 @@ void MicropitcherAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    /*
     double time = std::fmod(juce::Time::getMillisecondCounterHiRes(), 1000.0);
 
     int noteNumber = (int) (time/100 + 50);
@@ -142,6 +146,7 @@ void MicropitcherAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto messageOff = juce::MidiMessage::noteOff (0, noteNumber, (juce::uint8) 100);
     midiMessages.addEvent(messageOn, 0);
     midiMessages.addEvent(messageOff, 0);
+    */
 
 
     // In case we have more outputs than inputs, this code clears any output
@@ -193,6 +198,28 @@ void MicropitcherAudioProcessor::setStateInformation (const void* data, int size
 }
 
 //==============================================================================
+
+void MicropitcherAudioProcessor::valueTreePropertyChanged(juce::ValueTree& valueTree, const juce::Identifier& identifier)
+{
+    DBG("the plugin processor sees a property changing");
+}
+
+void MicropitcherAudioProcessor::valueTreeChildAdded(juce::ValueTree& parentTree, juce::ValueTree& childTree)
+{
+    if (childTree.getType() == TreeValues::graphIdentifier)
+    {
+        DBG("graph identifier changed");
+        //pathStringsChanged();
+    } else if (childTree.getType() == TreeValues::pathTreeIdentifier) {
+        DBG("path identifier changed");
+    }
+}
+
+void MicropitcherAudioProcessor::pathStringsChanged()
+{
+    DBG("The path strings were changed");
+}
+
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {

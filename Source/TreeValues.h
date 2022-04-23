@@ -3,7 +3,7 @@
 #include <JuceHeader.h>
 
 namespace TreeValues {
-    juce::Identifier graphIdentifier ("graph");
-    juce::Identifier pathTreeIdentifier ("pathTree");
-    juce::Identifier pathStringIdentifier ("pathString");
+    static juce::Identifier graphIdentifier ("graph");
+    static juce::Identifier pathTreeIdentifier ("pathTree");
+    static juce::Identifier pathStringIdentifier ("pathString");
 }

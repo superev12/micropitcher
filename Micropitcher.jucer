@@ -6,6 +6,7 @@
               pluginVST3Category="Tools">
   <MAINGROUP id="keYNKX" name="Micropitcher">
     <GROUP id="{028C3A6B-C65A-6981-3205-17ABD5CF209C}" name="Source">
+      <FILE id="Ch4bBW" name="MidiProcessor.h" compile="0" resource="0" file="Source/MidiProcessor.h"/>
       <GROUP id="{F196B614-0323-FCFD-A04B-1100B6A1A8C2}" name="Components">
         <FILE id="Y7pyYL" name="GraphComponent.cpp" compile="1" resource="0"
               file="Source/Components/GraphComponent.cpp"/>

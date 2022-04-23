@@ -13,7 +13,7 @@
 //==============================================================================
 /**
 */
-class MicropitcherAudioProcessor  : public juce::AudioProcessor
+class MicropitcherAudioProcessor  : public juce::AudioProcessor, public juce::ValueTree::Listener
 {
 public:
     //==============================================================================
@@ -52,6 +52,11 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+
+    //==============================================================================
+    void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier&) override;
+    void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override;
+    void pathStringsChanged();
 
 private:
     juce::ValueTree valueTree {"tree", {},
