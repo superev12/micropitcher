@@ -150,22 +150,29 @@ void MicropitcherAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     {
         auto currentMessagePointer = cachedMidiSequence.getEventPointer(nextMessageIndex);
         auto currentMessageTimeInMilliseconds = cachedMidiSequence.getEventTime(nextMessageIndex);
+        double sampleDurationInMilliseconds = 1000 / getSampleRate();
+        const double bufferDurationInMilliseconds = sampleDurationInMilliseconds * getBlockSize();
         auto currentMessage = currentMessagePointer->message;
+
+        /*
 
         if (currentMessageTimeInMilliseconds <= timeNowInMilliseconds)
         {
+            DBG("adding a missed event");
             midiMessages.addEvent(currentMessage, 0);
-        } else {
-            double sampleDurationInMilliseconds = 1000 / getSampleRate();
+        } else if (currentMessageTimeInMilliseconds < currentMessageTimeInMilliseconds + bufferDurationInMilliseconds) {
+            DBG("queueing an event");
             double howFarInTheFutureTheTheSampleIsInMilliseconds = currentMessageTimeInMilliseconds - timeNowInMilliseconds;
             int sampleNumber = (int) howFarInTheFutureTheTheSampleIsInMilliseconds/sampleDurationInMilliseconds;
             midiMessages.addEvent(currentMessage, sampleNumber);
         }
+        */
 
         if (nextMessageIndex == cachedMidiSequence.getNumEvents() - 1) break;
 
         nextMessageIndex++;
     }
+    timeThenInMilliseconds = timeNowInMilliseconds;
     //DBG(juce::String(midiMessages));
 
     /*
@@ -261,6 +268,7 @@ void MicropitcherAudioProcessor::pathStringsChanged()
     DBG("The path strings were changed");
     std::vector<juce::String> pathStrings = readPathStringsFromValueTree();
     cachedMidiSequence = renderPathstringsToMidiSequence(pathStrings);
+
 }
 
 // This creates new instances of the plugin..

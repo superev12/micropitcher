@@ -2,8 +2,9 @@
 
 <JUCERPROJECT id="jWt0YS" name="Micropitcher" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              companyName="Evan Snoswell" version="0.0.1" pluginCharacteristicsValue="pluginProducesMidiOut"
-              pluginVST3Category="Tools">
+              companyName="Evan Snoswell" version="0.0.1" pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut"
+              pluginVST3Category="Fx,Tools" pluginFormats="buildAU,buildStandalone,buildVST3"
+              splashScreenColour="Light">
   <MAINGROUP id="keYNKX" name="Micropitcher">
     <GROUP id="{028C3A6B-C65A-6981-3205-17ABD5CF209C}" name="Source">
       <FILE id="Ch4bBW" name="MidiProcessor.h" compile="0" resource="0" file="Source/MidiProcessor.h"/>
