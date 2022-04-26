@@ -12,11 +12,15 @@ juce::MidiMessageSequence renderNodeArrayToMidiSequence(pathHelper::NodeArray no
 {
     auto midiSequence = juce::MidiMessageSequence();
 
-    const juce::MidiMessage firstMessage = juce::MidiMessage::noteOn(1, 64, 0.5f);
-    midiSequence.addEvent(firstMessage, (double) nodeArray[0].point.x);
+    juce::MidiMessage firstMessage = juce::MidiMessage::noteOn(1, 64, 0.5f);
+    double firstMessageTime = (double) nodeArray[0].point.x;
+    firstMessage.setTimeStamp(firstMessageTime);
+    midiSequence.addEvent(firstMessage, firstMessageTime);
 
-    const juce::MidiMessage lastMessage = juce::MidiMessage::noteOff(1, 64, 1.0f);
-    midiSequence.addEvent(lastMessage, (double) nodeArray[nodeArray.size()-1].point.x);
+    juce::MidiMessage lastMessage = juce::MidiMessage::noteOff(1, 64, 1.0f);
+    double lastMessageTime = (double) nodeArray[nodeArray.size()-1].point.x;
+    lastMessage.setTimeStamp(lastMessageTime);
+    midiSequence.addEvent(lastMessage, lastMessageTime);
 
     return midiSequence;
 }
