@@ -147,6 +147,7 @@ void MicropitcherAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     int nextMessageIndex = cachedMidiSequence.getNextIndexAtTime(timeAtLastUpdate);
     bool reachedEndOfSequence = nextMessageIndex >= cachedMidiSequence.getNumEvents();
 
+    int baseSampleNumber = 0;
     while (cachedMidiSequence.getEventTime(nextMessageIndex) < timeNowInMilliseconds && !reachedEndOfSequence)
     {
         auto currentMessagePointer = cachedMidiSequence.getEventPointer(nextMessageIndex);
@@ -155,13 +156,27 @@ void MicropitcherAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         double sampleDurationInMilliseconds = 1000 / getSampleRate();
         double blockDurationInMilliseconds = getBlockSize() * sampleDurationInMilliseconds;
 
+        DBG(juce::String::formatted("before %f now %f next %f", timeThenInMilliseconds, timeNowInMilliseconds, timeNowInMilliseconds + blockDurationInMilliseconds));
+
         if (currentMessageTimeInMilliseconds <= timeNowInMilliseconds)
         {
-            midiMessages.addEvent(currentMessage, 0);
+            bool success = midiMessages.addEvent(currentMessage, baseSampleNumber++);
+            if (success)
+            {
+                DBG(juce::String("sending ") + currentMessage.getDescription() + juce::String(" at sample 0"));
+            } else {
+                DBG(juce::String("failed to send") + currentMessage.getDescription() + juce::String(" at sample 0"));
+            }
         } else if (currentMessageTimeInMilliseconds < timeNowInMilliseconds + blockDurationInMilliseconds) {
             double howFarInTheFutureTheTheSampleIsInMilliseconds = currentMessageTimeInMilliseconds - timeNowInMilliseconds;
             int sampleNumber = (int) howFarInTheFutureTheTheSampleIsInMilliseconds/sampleDurationInMilliseconds;
-            midiMessages.addEvent(currentMessage, sampleNumber);
+            bool success = midiMessages.addEvent(currentMessage, sampleNumber);
+            if (success)
+            {
+                DBG(juce::String("sending") + currentMessage.getDescription());
+            } else {
+                DBG(juce::String("failed to send") + currentMessage.getDescription());
+            }
         }
 
         if (nextMessageIndex == cachedMidiSequence.getNumEvents() - 1) break;

@@ -41,7 +41,8 @@ GraphComponent::GraphComponent (juce::ValueTree& state) : valueTree(state)
     // Add Test path to graph valueTree
 
     juce::ValueTree pathTree1 (TreeValues::pathTreeIdentifier);
-    pathTree1.setProperty(TreeValues::pathStringIdentifier, "a m 274.9234 204 c 312 178 320 218 368 202 432 186 472 242 362 292", nullptr);
+    pathTree1.setProperty(TreeValues::pathStringIdentifier, "a m 45 120.428 c 71.5 126.9725 75.7675 72.15 104.1315 94.125 118.315 106.555 146.63 152.8575 184.5 154.23025 223.735 93.8025 213.3325 129 227.6475 115.12", nullptr);
+
     valueTree.getChildWithName(TreeValues::graphIdentifier).addChild(pathTree1, 0, nullptr);
 
     juce::ValueTree pathTree2 (TreeValues::pathTreeIdentifier);
@@ -51,14 +52,6 @@ GraphComponent::GraphComponent (juce::ValueTree& state) : valueTree(state)
     readPathsFromValueTree();
 
     //[/Constructor_pre]
-
-    /*
-    internalPath1.setUsingNonZeroWinding (false);
-    internalPath1.startNewSubPath (274.0f, 204.0f);
-    internalPath1.cubicTo (312.0f, 178.0f, 320.0f, 218.0f, 368.0f, 202.0f);
-    internalPath1.cubicTo (432.0f, 186.0f, 472.0f, 242.0f, 362.0f, 292.0f);
-    internalPath1.lineTo (234.0f, 342.0f);
-    */
 
 
     //[UserPreSize]
@@ -89,24 +82,6 @@ void GraphComponent::paint (juce::Graphics& g)
     //[/UserPrePaint]
 
     g.fillAll (juce::Colour (0xff323e44));
-
-    {
-        float x = 244.0f, y = 220.0f, width = 100.0f, height = 100.0f;
-        juce::Colour fillColour = juce::Colour (0xffa52aa4);
-        //[UserPaintCustomArguments] Customize the painting arguments here..
-        //[/UserPaintCustomArguments]
-        g.setColour (fillColour);
-        g.fillRoundedRectangle (x, y, width, height, 10.000f);
-    }
-
-    {
-        float x = 0, y = 0;
-        juce::Colour strokeColour = juce::Colour (0xff4ea52a);
-        //[UserPaintCustomArguments] Customize the painting arguments here..
-        //[/UserPaintCustomArguments]
-        g.setColour (strokeColour);
-        g.strokePath (internalPath1, juce::PathStrokeType (5.000f), juce::AffineTransform::translation(x, y));
-    }
 
     //[UserPaint] Add your own custom painting code here..
     int numberOfPaths = pathStrings.size();

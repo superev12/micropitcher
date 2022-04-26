@@ -11,7 +11,14 @@ namespace pathHelper
         juce::Point<float> handleR;
     };
 
-    typedef std::vector<Node> NodeArray ;
+    typedef std::vector<Node> NodeArray;
+
+    static float clampFloat(float x, float low, float high)
+    {
+        if (x < low) return low;
+        if (x > high) return high;
+        return x;
+    }
 
 
     static std::vector<juce::String>splitString(juce::String& string, char splitChar)
@@ -229,14 +236,37 @@ namespace pathHelper
     {
         NodeArray nodeArray = stringToNodeArray(pathString);
         auto oldPosition = nodeArray[nodeIndex].point;
+
+        // Clamp range between adjacent notes
+        float pointTop = (nodeIndex == nodeArray.size()-1) ? 1000.0f : nodeArray[nodeIndex+1].point.x;
+        float pointBottom = (nodeIndex == 0) ? 0 : nodeArray[nodeIndex-1].point.x;
+
+        newPosition.x = clampFloat(newPosition.x, pointBottom, pointTop);
         auto difference = newPosition - oldPosition;
 
         // Move point
         nodeArray[nodeIndex].point = newPosition;
 
         // Move handles with point
-        nodeArray[nodeIndex].handleL += difference;
-        nodeArray[nodeIndex].handleR += difference;
+        float handleLTop = nodeArray[nodeIndex].point.x;
+        float handleLBottom = (nodeIndex == 0) ? 0 : nodeArray[nodeIndex-1].point.x;
+
+        float handleRTop = (nodeIndex == nodeArray.size()-1) ? 1000.0f : nodeArray[nodeIndex+1].point.x;
+        float handleRBottom = nodeArray[nodeIndex].point.x;
+
+        nodeArray[nodeIndex].handleL.x = clampFloat(
+            difference.x + nodeArray[nodeIndex].handleL.x,
+            handleLBottom,
+            handleLTop
+        );
+        nodeArray[nodeIndex].handleL.y += difference.y;
+
+        nodeArray[nodeIndex].handleR.x = clampFloat(
+            difference.x + nodeArray[nodeIndex].handleR.x,
+            handleRBottom,
+            handleRTop
+        );
+        nodeArray[nodeIndex].handleR.y += difference.y;
 
         return nodeArrayToString(nodeArray);
     }
@@ -244,7 +274,11 @@ namespace pathHelper
     static juce::String moveNodeHandleL(juce::String& pathString, int nodeIndex, juce::Point<float> newPosition)
     {
         NodeArray nodeArray = stringToNodeArray(pathString);
-        nodeArray[nodeIndex].handleL.x = newPosition.x;
+        float top = nodeArray[nodeIndex].point.x;
+        float bottom = (nodeIndex == 0) ? 0 : nodeArray[nodeIndex-1].point.x;
+
+
+        nodeArray[nodeIndex].handleL.x = clampFloat(newPosition.x, bottom, top);
         nodeArray[nodeIndex].handleL.y = newPosition.y;
         return nodeArrayToString(nodeArray);
     }
@@ -252,7 +286,11 @@ namespace pathHelper
     static juce::String moveNodeHandleR(juce::String& pathString, int nodeIndex, juce::Point<float> newPosition)
     {
         NodeArray nodeArray = stringToNodeArray(pathString);
-        nodeArray[nodeIndex].handleR.x = newPosition.x;
+
+        float top = (nodeIndex == nodeArray.size()-1) ? 1000.0f : nodeArray[nodeIndex+1].point.x;
+        float bottom = nodeArray[nodeIndex].point.x;
+
+        nodeArray[nodeIndex].handleR.x = clampFloat(newPosition.x, bottom, top);
         nodeArray[nodeIndex].handleR.y = newPosition.y;
         return nodeArrayToString(nodeArray);
     }
