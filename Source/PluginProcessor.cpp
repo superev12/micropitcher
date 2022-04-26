@@ -145,18 +145,20 @@ void MicropitcherAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     double timeAtLastUpdate = timeNowInMilliseconds - deltaTimeInMilliseconds;
 
     int nextMessageIndex = cachedMidiSequence.getNextIndexAtTime(timeAtLastUpdate);
+    bool reachedEndOfSequence = nextMessageIndex >= cachedMidiSequence.getNumEvents();
 
-    while (cachedMidiSequence.getEventTime(nextMessageIndex) < timeNowInMilliseconds)
+    while (cachedMidiSequence.getEventTime(nextMessageIndex) < timeNowInMilliseconds && !reachedEndOfSequence)
     {
         auto currentMessagePointer = cachedMidiSequence.getEventPointer(nextMessageIndex);
         auto currentMessageTimeInMilliseconds = cachedMidiSequence.getEventTime(nextMessageIndex);
         auto currentMessage = currentMessagePointer->message;
+        double sampleDurationInMilliseconds = 1000 / getSampleRate();
+        double blockDurationInMilliseconds = getBlockSize() * sampleDurationInMilliseconds;
 
         if (currentMessageTimeInMilliseconds <= timeNowInMilliseconds)
         {
             midiMessages.addEvent(currentMessage, 0);
-        } else {
-            double sampleDurationInMilliseconds = 1000 / getSampleRate();
+        } else if (currentMessageTimeInMilliseconds < timeNowInMilliseconds + blockDurationInMilliseconds) {
             double howFarInTheFutureTheTheSampleIsInMilliseconds = currentMessageTimeInMilliseconds - timeNowInMilliseconds;
             int sampleNumber = (int) howFarInTheFutureTheTheSampleIsInMilliseconds/sampleDurationInMilliseconds;
             midiMessages.addEvent(currentMessage, sampleNumber);
@@ -165,7 +167,10 @@ void MicropitcherAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         if (nextMessageIndex == cachedMidiSequence.getNumEvents() - 1) break;
 
         nextMessageIndex++;
+        reachedEndOfSequence = nextMessageIndex >= cachedMidiSequence.getNumEvents();
     }
+
+    timeThenInMilliseconds = timeNowInMilliseconds;
     //DBG(juce::String(midiMessages));
 
     /*
