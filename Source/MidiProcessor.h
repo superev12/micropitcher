@@ -18,7 +18,16 @@ juce::MidiMessageSequence renderNodeArrayToMidiSequence(pathHelper::NodeArray no
     midiSequence.addEvent(firstMessage, firstMessageTime);
 
     juce::MidiMessage lastMessage = juce::MidiMessage::noteOff(1, 64, 1.0f);
-    double lastMessageTime = (double) nodeArray[nodeArray.size()-1].point.x;
+
+    double lastMessageTime;
+    if (nodeArray.size() == 1)
+    {
+        // Ensure single point paths have a nonzero duration
+        lastMessageTime = (double) nodeArray[nodeArray.size()-1].point.x + 10;
+    } else {
+        lastMessageTime = (double) nodeArray[nodeArray.size()-1].point.x;
+    }
+
     lastMessage.setTimeStamp(lastMessageTime);
     midiSequence.addEvent(lastMessage, lastMessageTime);
 
@@ -36,9 +45,21 @@ juce::MidiMessageSequence renderPathstringsToMidiSequence(std::vector<juce::Stri
         pathsAsNodeArrays.push_back(pathHelper::stringToNodeArray(pathString));
     }
 
-    juce::MidiMessageSequence midiSequence = renderNodeArrayToMidiSequence(pathsAsNodeArrays[0]);
+    std::vector<juce::MidiMessageSequence> midiSequences = {};
+    for (auto nodeArray : pathsAsNodeArrays)
+    {
+        midiSequences.push_back(
+            renderNodeArrayToMidiSequence(nodeArray)
+        );
+    }
 
-    return midiSequence;
+    juce::MidiMessageSequence outputMidiSequence;
+    for (auto midiSequence : midiSequences)
+    {
+        outputMidiSequence.addSequence(midiSequence, 0.0);
+    }
+
+    return outputMidiSequence;
 }
 
 
