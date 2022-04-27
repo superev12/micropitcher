@@ -33,7 +33,7 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class DetailsComponent  : public juce::Component
+class DetailsComponent  : public juce::Component, juce::ValueTree::Listener
 {
 public:
     //==============================================================================
