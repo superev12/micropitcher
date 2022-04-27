@@ -48,6 +48,7 @@ public:
     void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier&) override;
     void readPathsFromValueTree();
     void writePathsToValueTree();
+    void writeSelectedPathToValueTree(int);
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -69,6 +70,7 @@ private:
     void drawNodePoint(juce::Graphics& g, juce::Point<float>);
     void drawNodeHandle(juce::Graphics& g, juce::Point<float>, juce::Point<float>);
 
+    int selectedPathIndex = -1;
     int grabbedPathIndex = -1;
     int grabbedNodeIndex = -1;
     handleType grabbedHandleType = handleType::NODE;

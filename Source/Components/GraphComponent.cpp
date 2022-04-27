@@ -37,6 +37,7 @@ GraphComponent::GraphComponent (juce::ValueTree& state) : valueTree(state)
     // Add ValueTree for graph
     juce::ValueTree graphState (TreeValues::graphIdentifier);
     valueTree.addChild(graphState, -1, nullptr);
+    writeSelectedPathToValueTree(0);
 
     // Add Test path to graph valueTree
 
@@ -91,19 +92,29 @@ void GraphComponent::paint (juce::Graphics& g)
         path.restoreFromString(pathStrings[i]);
         juce::Colour strokeColour = juce::Colour (0xff4ea52a);
         g.setColour (strokeColour);
-        g.strokePath (path, juce::PathStrokeType (5.000f), juce::AffineTransform::translation(0.0f, 0.0f));
+
 
         auto nodeArray = pathHelper::stringToNodeArray(pathStrings[i]);
-
-        for (int j = 0; j < nodeArray.size(); j++)
+        if (nodeArray.size() == 1)
         {
-            auto nodePosition = nodeArray[j].point;
-            auto nodeHandleLPosition = nodeArray[j].handleL;
-            auto nodeHandleRPosition = nodeArray[j].handleR;
+            auto node = nodeArray[0];
+            g.fillEllipse(node.point.x, node.point.y, 5.0f, 5.0f);
+        } else {
+            g.strokePath (path, juce::PathStrokeType (5.000f), juce::AffineTransform::translation(0.0f, 0.0f));
+        }
 
-            drawNodeHandle(g, nodePosition, nodeHandleLPosition);
-            drawNodeHandle(g, nodePosition, nodeHandleRPosition);
-            drawNodePoint(g, nodePosition);
+        if (selectedPathIndex == i)
+        {
+            for (int j = 0; j < nodeArray.size(); j++)
+            {
+                auto nodePosition = nodeArray[j].point;
+                auto nodeHandleLPosition = nodeArray[j].handleL;
+                auto nodeHandleRPosition = nodeArray[j].handleR;
+
+                drawNodeHandle(g, nodePosition, nodeHandleLPosition);
+                drawNodeHandle(g, nodePosition, nodeHandleRPosition);
+                drawNodePoint(g, nodePosition);
+            }
         }
 
 
@@ -253,9 +264,13 @@ void GraphComponent::modifierKeysChanged (const juce::ModifierKeys& modifiers)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+
 void GraphComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& id)
 {
-
+    if (id == TreeValues::selectedPathIdentifier)
+    {
+        selectedPathIndex = (int) valueTree.getProperty(id);
+    }
 }
 
 void GraphComponent::readPathsFromValueTree()
@@ -287,6 +302,11 @@ void GraphComponent::writePathsToValueTree()
         graphTree.removeChild(i, nullptr);
         graphTree.addChild(pathTree, i, nullptr);
     }
+}
+
+void GraphComponent::writeSelectedPathToValueTree(int selectedPathIndex)
+{
+    valueTree.setProperty(TreeValues::selectedPathIdentifier, selectedPathIndex, nullptr);
 }
 
 void GraphComponent::drawNodePoint(juce::Graphics& g, juce::Point<float> point)
