@@ -43,7 +43,6 @@ GraphComponent::GraphComponent (juce::ValueTree& state) : valueTree(state)
 
     juce::ValueTree pathTree1 (TreeValues::pathTreeIdentifier);
     pathTree1.setProperty(TreeValues::pathStringIdentifier, "a m 45 120.428 c 71.5 126.9725 75.7675 72.15 104.1315 94.125 118.315 106.555 146.63 152.8575 184.5 154.23025 223.735 93.8025 213.3325 129 227.6475 115.12", nullptr);
-
     valueTree.getChildWithName(TreeValues::graphIdentifier).addChild(pathTree1, 0, nullptr);
 
     juce::ValueTree pathTree2 (TreeValues::pathTreeIdentifier);
@@ -98,7 +97,7 @@ void GraphComponent::paint (juce::Graphics& g)
         if (nodeArray.size() == 1)
         {
             auto node = nodeArray[0];
-            g.fillEllipse(node.point.x, node.point.y, 5.0f, 5.0f);
+            g.fillEllipse(node.point.x - lineStrokeWidth/2, node.point.y - lineStrokeWidth/2, lineStrokeWidth, lineStrokeWidth);
         } else {
             g.strokePath (path, juce::PathStrokeType (5.000f), juce::AffineTransform::translation(0.0f, 0.0f));
         }
@@ -144,6 +143,28 @@ void GraphComponent::mouseDown (const juce::MouseEvent& e)
     //[UserCode_mouseDown] -- Add your code here...
 
     auto mousePoint = e.getPosition().toFloat();
+
+    selectedPathIndex = -1;
+    // get was path selected
+    for (int pathIndex = 0; pathIndex < pathStrings.size(); pathIndex++)
+    {
+        auto nodeArray = pathHelper::stringToNodeArray(pathStrings[pathIndex]);
+        float distanceToPoint;
+        if (nodeArray.size() == 1)
+        {
+            distanceToPoint = mousePoint.getDistanceFrom(nodeArray[0].point);
+        } else {
+            juce::Path path;
+            path.restoreFromString(pathStrings[pathIndex]);
+            juce::Point<float> nearestPointToMouse;
+            path.getNearestPoint(mousePoint, nearestPointToMouse);
+            distanceToPoint = mousePoint.getDistanceFrom(nearestPointToMouse);
+        }
+        if (distanceToPoint < 5.0f) selectedPathIndex = pathIndex;
+        DBG(juce::String(pathIndex) + juce::String(" e ") + juce::String(distanceToPoint));
+
+    }
+
 
     // get node clicked
     for (int pathIndex = 0; pathIndex < pathStrings.size(); pathIndex++)

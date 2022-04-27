@@ -75,6 +75,7 @@ private:
     int grabbedNodeIndex = -1;
     handleType grabbedHandleType = handleType::NODE;
 
+    const float lineStrokeWidth = 5.0f;
     const float pointHandleRadius = 5.0f;
     const float pointHandleDiameter = pointHandleRadius * 2;
     const float pointHandleStrokeWeight = 5.0f;

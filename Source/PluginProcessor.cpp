@@ -156,16 +156,16 @@ void MicropitcherAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         double sampleDurationInMilliseconds = 1000 / getSampleRate();
         double blockDurationInMilliseconds = getBlockSize() * sampleDurationInMilliseconds;
 
-        DBG(juce::String::formatted("before %f now %f next %f", timeThenInMilliseconds, timeNowInMilliseconds, timeNowInMilliseconds + blockDurationInMilliseconds));
+        //DBG(juce::String::formatted("before %f now %f next %f", timeThenInMilliseconds, timeNowInMilliseconds, timeNowInMilliseconds + blockDurationInMilliseconds));
 
         if (currentMessageTimeInMilliseconds <= timeNowInMilliseconds)
         {
             bool success = midiMessages.addEvent(currentMessage, baseSampleNumber++);
             if (success)
             {
-                DBG(juce::String("sending ") + currentMessage.getDescription() + juce::String(" at sample 0"));
+                //DBG(juce::String("sending ") + currentMessage.getDescription() + juce::String(" at sample 0"));
             } else {
-                DBG(juce::String("failed to send") + currentMessage.getDescription() + juce::String(" at sample 0"));
+                //DBG(juce::String("failed to send") + currentMessage.getDescription() + juce::String(" at sample 0"));
             }
         } else if (currentMessageTimeInMilliseconds < timeNowInMilliseconds + blockDurationInMilliseconds) {
             double howFarInTheFutureTheTheSampleIsInMilliseconds = currentMessageTimeInMilliseconds - timeNowInMilliseconds;
@@ -173,9 +173,9 @@ void MicropitcherAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             bool success = midiMessages.addEvent(currentMessage, sampleNumber);
             if (success)
             {
-                DBG(juce::String("sending") + currentMessage.getDescription());
+                //DBG(juce::String("sending") + currentMessage.getDescription());
             } else {
-                DBG(juce::String("failed to send") + currentMessage.getDescription());
+                //DBG(juce::String("failed to send") + currentMessage.getDescription());
             }
         }
 
