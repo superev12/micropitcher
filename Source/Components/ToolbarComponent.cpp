@@ -74,7 +74,7 @@ void ToolbarComponent::paint (juce::Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (juce::Colours::red);
+    g.fillAll (juce::Colour(238, 232, 213));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]

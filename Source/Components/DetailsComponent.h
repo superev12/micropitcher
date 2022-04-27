@@ -42,6 +42,8 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier&) override;
+    void rerenderText();
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -55,6 +57,13 @@ private:
     //[/UserVariables]
 
     //==============================================================================
+    std::unique_ptr<juce::TextEditor> juce__textEditor1;
+    std::unique_ptr<juce::Label> juce__label;
+    std::unique_ptr<juce::TextEditor> juce__textEditor2;
+    std::unique_ptr<juce::Label> juce__label2;
+    std::unique_ptr<juce::Label> juce__label3;
+    std::unique_ptr<juce::TextEditor> juce__textEditor3;
+    std::unique_ptr<juce::Label> juce__label4;
 
 
     //==============================================================================

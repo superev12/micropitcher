@@ -80,7 +80,7 @@ void MainComponent::resized()
 
     //[UserResized] Add your own custom resize handling here..
     auto area = getLocalBounds();
-    toolbarComponent.setBounds(area.removeFromLeft(40));
+    toolbarComponent.setBounds(area.removeFromLeft(100));
     detailsComponent.setBounds(area.removeFromRight(150));
     graphContainerComponent.setBounds(area);
     //[/UserResized]

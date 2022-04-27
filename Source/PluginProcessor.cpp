@@ -282,7 +282,7 @@ void MicropitcherAudioProcessor::pathStringsChanged()
 {
     DBG("The path strings were changed");
     std::vector<juce::String> pathStrings = readPathStringsFromValueTree();
-    cachedMidiSequence = renderPathstringsToMidiSequence(pathStrings);
+    cachedMidiSequence = midiProcessor::renderPathstringsToMidiSequence(pathStrings);
 }
 
 // This creates new instances of the plugin..

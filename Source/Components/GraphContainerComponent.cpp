@@ -67,10 +67,10 @@ void GraphContainerComponent::paint (juce::Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (juce::Colour (0xff323e44));
+    g.fillAll (juce::Colour (253, 246, 227));
 
     //[UserPaint] Add your own custom painting code here..
-    g.fillAll (backgroundColour);
+    //g.fillAll (backgroundColour);
     //[/UserPaint]
 }
 
