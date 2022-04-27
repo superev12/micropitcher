@@ -7,6 +7,55 @@ void setupMpe(juce::MidiBuffer& midiBuffer)
 {
 }
 
+double binarySearchPath(juce::Path& path, double target, double threshold, double start, double end)
+{
+    double middle = (start + end) / 2;
+
+    juce::Point<float> pointAtMiddle = path.getPointAlongPath(middle);
+    juce::Point<float> pointAtTarget = path.getPointAlongPath(target);
+    
+    // The current value is close enough
+    if (std::abs(pointAtMiddle.x - pointAtTarget.x) < threshold) return pointAtMiddle.y;
+
+    double nextStart, nextEnd;
+
+    // The current value is too high
+    if (pointAtMiddle.x > pointAtTarget.x)
+    {
+        nextStart = start;
+        nextEnd = middle;
+    }
+
+    // The current value is too low
+    if (pointAtMiddle.x <= pointAtTarget.x)
+    {
+        nextStart = middle;
+        nextEnd = end;
+    }
+
+    return binarySearchPath(path, target, threshold, nextStart, nextEnd);
+}
+
+/*
+find the difference from between the median pitch on a path and the current pitch, given a time in milliseconds
+If the time given is outside the path, the time value is clamped to the time range of the path.
+*/
+double getSemitoneDeviationAtTime(pathHelper::NodeArray nodeArray, double timeInMilliseconds)
+{
+    // clamp timeInMilliseconds to the time bounds of the path
+    float firstTimeOnCurve = nodeArray[0].point.x;
+    float lastTimeOnCurve = nodeArray[nodeArray.size()-1].point.x;
+    timeInMilliseconds = pathHelper::clampFloat(timeInMilliseconds, firstTimeOnCurve, lastTimeOnCurve);
+
+
+    // Find the two nodes the time falls between
+    juce::Path path;
+    path.restoreFromString(pathHelper::nodeArrayToString(nodeArray));
+    double frequencyAtSample = binarySearchPath(path, timeInMilliseconds, 1.0, firstTimeOnCurve, lastTimeOnCurve);
+
+    return frequencyAtSample;
+}
+
 std::vector<double> sampleSemitoneDeviation(pathHelper::NodeArray nodeArray, float samplesPerMillisecond)
 {
     double timeBetweenSamplesInMilliseconds = 1.0/samplesPerMillisecond;
@@ -17,6 +66,7 @@ std::vector<double> sampleSemitoneDeviation(pathHelper::NodeArray nodeArray, flo
     std::vector<double> samples = {};
     for (int sampleIndex = 0; sampleIndex < numberOfSamplesInPath; sampleIndex++)
     {
+        double deviation = getSemitoneDeviationAtTime(nodeArray, sampleIndex*timeBetweenSamplesInMilliseconds);
         samples.push_back(10.0 * std::sin(sampleIndex/200.0f));
     }
 
