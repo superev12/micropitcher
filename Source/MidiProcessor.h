@@ -1,10 +1,38 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <math.h>
 #include "PathHelper.h"
 
 void setupMpe(juce::MidiBuffer& midiBuffer)
 {
+}
+
+double frequencyToMidiNote(double frequencyInHz)
+{
+    return 12.0*std::log2(frequencyInHz/440.0) + 69.0;
+}
+
+double midiNoteToFrequency(double midiNoteNumber)
+{
+    return 440 * std::pow(2, (midiNoteNumber-69)/12);
+}
+
+int getMedianMidiNoteNumber(pathHelper::NodeArray nodeArray)
+{
+    juce::Path path;
+    path.restoreFromString(pathHelper::nodeArrayToString(nodeArray));
+
+    juce::Rectangle<float> bounds = path.getBounds();
+
+    // Note: The 'Bottom' of a shape in juce world is the part with the highest Y coordinate
+    double topFrequency = bounds.getBottom();
+    double bottomFrequency = bounds.getY();
+
+    double topMidiNoteNumber = frequencyToMidiNote(topFrequency);
+    double bottomMidiNoteNumber = frequencyToMidiNote(bottomFrequency);
+
+    return (topMidiNoteNumber - bottomMidiNoteNumber) / 2.0;
 }
 
 double binarySearchPath(juce::Path& path, double target, double threshold, double start, double end)
@@ -53,8 +81,13 @@ double getSemitoneDeviationAtTime(pathHelper::NodeArray nodeArray, double timeIn
     path.restoreFromString(pathHelper::nodeArrayToString(nodeArray));
     double frequencyAtSample = binarySearchPath(path, timeInMilliseconds, 1.0, firstTimeOnCurve, lastTimeOnCurve);
 
-    return frequencyAtSample;
+    int medianNoteMidiNumber = getMedianMidiNoteNumber(nodeArray);
+    double midiNumberAtSample = frequencyToMidiNote(frequencyAtSample);
+
+    return midiNumberAtSample - ((double) medianNoteMidiNumber);
 }
+
+
 
 std::vector<double> sampleSemitoneDeviation(pathHelper::NodeArray nodeArray, float samplesPerMillisecond)
 {
@@ -62,12 +95,15 @@ std::vector<double> sampleSemitoneDeviation(pathHelper::NodeArray nodeArray, flo
     float pathTimeRangeInMilliseconds = nodeArray[nodeArray.size()-1].point.x - nodeArray[0].point.x;
     int numberOfSamplesInPath = std::floor(pathTimeRangeInMilliseconds / timeBetweenSamplesInMilliseconds);
 
+    // Get floored median note number
+    int medianNoteMidiNumber = getMedianMidiNoteNumber(nodeArray);
+
     // get sample at timeBetweenSamplesInMilliseconds intervals
     std::vector<double> samples = {};
     for (int sampleIndex = 0; sampleIndex < numberOfSamplesInPath; sampleIndex++)
     {
         double deviation = getSemitoneDeviationAtTime(nodeArray, sampleIndex*timeBetweenSamplesInMilliseconds);
-        samples.push_back(10.0 * std::sin(sampleIndex/200.0f));
+        samples.push_back(deviation);
     }
 
     return samples;
@@ -77,24 +113,29 @@ std::vector<double> sampleSemitoneDeviation(pathHelper::NodeArray nodeArray, flo
 juce::MidiMessageSequence renderNodeArrayToMidiSequence(pathHelper::NodeArray nodeArray)
 {
     auto midiSequence = juce::MidiMessageSequence();
+    int medianMidiNoteNumber = getMedianMidiNoteNumber(nodeArray);
 
     // Add midiOn at path start
-    juce::MidiMessage firstMessage = juce::MidiMessage::noteOn(1, 64, 0.5f);
+    juce::MidiMessage firstMessage = juce::MidiMessage::noteOn(1, medianMidiNoteNumber, 0.5f);
     double firstMessageTime = (double) nodeArray[0].point.x;
     firstMessage.setTimeStamp(firstMessageTime);
     midiSequence.addEvent(firstMessage, firstMessageTime);
-    juce::MidiMessage lastMessage = juce::MidiMessage::noteOff(1, 64, 1.0f);
+    juce::MidiMessage lastMessage = juce::MidiMessage::noteOff(1, medianMidiNoteNumber, 1.0f);
 
     // Sample points in path middle
     float samplesPerMillisecond = 0.1f;
     std::vector<double> pitchDeviationSamples = sampleSemitoneDeviation(nodeArray, samplesPerMillisecond);
+
+    // Middle points to midi messages
     std::vector<juce::MidiMessage> middleMessages = {};
     for (double pitchDeviationInSemitones : pitchDeviationSamples)
     {
-        int pitchbend = juce::MidiMessage::pitchbendToPitchwheelPos((float) pitchDeviationInSemitones, 48.0f);
+        float clampedPitchDeviationInSemitones = pathHelper::clampFloat((float) pitchDeviationInSemitones, -48.0f, 48.0f);
+        int pitchbend = juce::MidiMessage::pitchbendToPitchwheelPos(clampedPitchDeviationInSemitones, 48.0f);
         juce::MidiMessage middleMessage = juce::MidiMessage::pitchWheel(1, pitchbend);
         middleMessages.push_back(middleMessage);
     }
+    // Add middle messages to sequence with timestamps
     for (int messageIndex = 0; messageIndex < middleMessages.size(); messageIndex++)
     {
         double timeBetweenSamplesInMilliseconds = 1.0/samplesPerMillisecond;
