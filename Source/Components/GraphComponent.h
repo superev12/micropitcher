@@ -50,6 +50,8 @@ public:
     void readPathsFromValueTree();
     void writePathsToValueTree();
     void writeSelectedPathToValueTree(int);
+
+
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -78,12 +80,6 @@ private:
 
     TreeValues::ToolModeValues toolMode = TreeValues::ToolModeValues::POINTER;
 
-    const float lineStrokeWidth = 5.0f;
-    const float pointHandleRadius = 5.0f;
-    const float pointHandleDiameter = pointHandleRadius * 2;
-    const float pointHandleStrokeWeight = 5.0f;
-
-    const float handleLineStrokeWeight = 2.0f;
     //[/UserVariables]
 
     //==============================================================================

@@ -26,6 +26,12 @@
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 #include "../TreeValues.h"
 #include "../PathHelper.h"
+
+const float lineStrokeWidth = 5.0f;
+const float pointHandleRadius = 5.0f;
+const float pointHandleDiameter = pointHandleRadius * 2;
+const float pointHandleStrokeWeight = 5.0f;
+const float handleLineStrokeWeight = 2.0f;
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -138,6 +144,94 @@ void GraphComponent::moved()
     //[/UserCode_moved]
 }
 
+static int getClickedHandleLIndex(juce::String selectedPathString, juce::Point<float>mousePoint)
+{
+    int clickedIndex = -1;
+
+    auto nodeArray = pathHelper::stringToNodeArray(selectedPathString);
+
+    for (int nodeIndex = 0; nodeIndex < nodeArray.size(); nodeIndex++)
+    {
+        if
+        (
+            nodeArray[nodeIndex].handleL.getDistanceFrom(mousePoint)
+                <
+            pointHandleRadius+pointHandleStrokeWeight/2
+        )
+        {
+            clickedIndex = nodeIndex;
+        }
+    }
+
+    return clickedIndex;
+}
+
+static int getClickedHandleRIndex(juce::String selectedPathString, juce::Point<float>mousePoint)
+{
+    int clickedIndex = -1;
+    auto nodeArray = pathHelper::stringToNodeArray(selectedPathString);
+
+    for (int nodeIndex = 0; nodeIndex < nodeArray.size(); nodeIndex++)
+    {
+        if
+        (
+            nodeArray[nodeIndex].handleR.getDistanceFrom(mousePoint)
+                <
+            pointHandleRadius+pointHandleStrokeWeight/2
+        )
+        {
+            clickedIndex = nodeIndex;
+        }
+    }
+
+    return clickedIndex;
+}
+
+static int getClickedNodeIndex(juce::String selectedPathString, juce::Point<float>mousePoint)
+{
+    int clickedIndex = -1;
+    auto nodeArray = pathHelper::stringToNodeArray(selectedPathString);
+
+    for (int nodeIndex = 0; nodeIndex < nodeArray.size(); nodeIndex++)
+    {
+        if
+        (
+            nodeArray[nodeIndex].point.getDistanceFrom(mousePoint)
+                <
+            pointHandleRadius+pointHandleStrokeWeight/2
+        )
+        {
+            clickedIndex = nodeIndex;
+        }
+    }
+
+    return clickedIndex;
+}
+
+static int getClickedPathIndex(std::vector<juce::String> pathStrings, juce::Point<float>mousePoint)
+{
+    int selectedPathIndex = -1;
+    for (int pathIndex = 0; pathIndex < pathStrings.size(); pathIndex++)
+    {
+        auto nodeArray = pathHelper::stringToNodeArray(pathStrings[pathIndex]);
+        float distanceToPoint;
+        if (nodeArray.size() == 1)
+        {
+            distanceToPoint = mousePoint.getDistanceFrom(nodeArray[0].point);
+        } else {
+            juce::Path path;
+            path.restoreFromString(pathStrings[pathIndex]);
+            juce::Point<float> nearestPointToMouse;
+            path.getNearestPoint(mousePoint, nearestPointToMouse);
+            distanceToPoint = mousePoint.getDistanceFrom(nearestPointToMouse);
+        }
+        if (distanceToPoint < 5.0f) selectedPathIndex = pathIndex;
+        //DBG(juce::String(pathIndex) + juce::String(" e ") + juce::String(distanceToPoint));
+    }
+
+    return selectedPathIndex;
+}
+
 void GraphComponent::mouseDown (const juce::MouseEvent& e)
 {
     //[UserCode_mouseDown] -- Add your code here...
@@ -146,80 +240,83 @@ void GraphComponent::mouseDown (const juce::MouseEvent& e)
 
     switch (toolMode)
     {
-        case TreeValues::ToolModeValues::POINTER:
+        case (TreeValues::ToolModeValues::POINTER):
+        {
             DBG("clicked in pointer mode");
-        selectedPathIndex = -1;
-        // get was path selected
-        for (int pathIndex = 0; pathIndex < pathStrings.size(); pathIndex++)
-        {
-            auto nodeArray = pathHelper::stringToNodeArray(pathStrings[pathIndex]);
-            float distanceToPoint;
-            if (nodeArray.size() == 1)
+            int clickedPathIndex = getClickedPathIndex(pathStrings, mousePoint);
+
+            if (selectedPathIndex == -1)
             {
-                distanceToPoint = mousePoint.getDistanceFrom(nodeArray[0].point);
-            } else {
-                juce::Path path;
-                path.restoreFromString(pathStrings[pathIndex]);
-                juce::Point<float> nearestPointToMouse;
-                path.getNearestPoint(mousePoint, nearestPointToMouse);
-                distanceToPoint = mousePoint.getDistanceFrom(nearestPointToMouse);
-            }
-            if (distanceToPoint < 5.0f) selectedPathIndex = pathIndex;
-            DBG(juce::String(pathIndex) + juce::String(" e ") + juce::String(distanceToPoint));
-
-        }
-
-
-        // get node clicked
-        for (int pathIndex = 0; pathIndex < pathStrings.size(); pathIndex++)
-        {
-            auto pathString = pathStrings[pathIndex];
-            auto nodeArray = pathHelper::stringToNodeArray(pathString);
-
-            for (int nodeIndex = 0; nodeIndex < nodeArray.size(); nodeIndex++)
-            {
-                if
-                (
-                    nodeArray[nodeIndex].point.getDistanceFrom(mousePoint)
-                        <
-                    pointHandleRadius+pointHandleStrokeWeight/2
-                )
+                // Nothing is currently selected
+                if (clickedPathIndex != selectedPathIndex)
                 {
-                    grabbedPathIndex = pathIndex;
-                    grabbedNodeIndex = nodeIndex;
-                    grabbedHandleType = handleType::NODE;
-                    //DBG(juce::String::formatted("setting grabbedHandleType to %i", grabbedHandleType));
+                    // A new path was clicked
+                    writeSelectedPathToValueTree(clickedPathIndex);
                 }
-                else if
-                (
-                    nodeArray[nodeIndex].handleL.getDistanceFrom(mousePoint)
-                        <
-                    pointHandleRadius+pointHandleStrokeWeight/2
-                )
+                else
                 {
-                    grabbedPathIndex = pathIndex;
-                    grabbedNodeIndex = nodeIndex;
+                    // Nothing was clicked, do nothing
+                }
+            }
+            else 
+            {
+                // A path is currently selected
+                auto selectedPathString = pathStrings[selectedPathIndex];
+                int clickedHandleLIndex = getClickedHandleLIndex(selectedPathString, mousePoint); 
+                int clickedHandleRIndex = getClickedHandleRIndex(selectedPathString, mousePoint); 
+                int clickedNodeIndex = getClickedNodeIndex(selectedPathString, mousePoint);
+
+                // Special case to prioritise the node at the end of paths
+                if (clickedNodeIndex == 0) clickedHandleLIndex = -1;
+                if (clickedNodeIndex == pathHelper::getNumberOfNodes(selectedPathString)-1) clickedHandleRIndex = -1;
+
+                if (clickedHandleLIndex != -1)
+                {
+                    // A left handle was clicked
+                    grabbedPathIndex = selectedPathIndex;
+                    grabbedNodeIndex = clickedHandleLIndex;
                     grabbedHandleType = handleType::LEFT;
+                    interactionState = DRAGGING;
                 }
-                else if
-                (
-                    nodeArray[nodeIndex].handleR.getDistanceFrom(mousePoint)
-                        <
-                    pointHandleRadius+pointHandleStrokeWeight/2
-                )
+                else if (clickedHandleRIndex != -1)
                 {
-                    grabbedPathIndex = pathIndex;
-                    grabbedNodeIndex = nodeIndex;
+                    // A right handle was clicked
+                    grabbedPathIndex = selectedPathIndex;
+                    grabbedNodeIndex = clickedHandleRIndex;
                     grabbedHandleType = handleType::RIGHT;
+                    interactionState = DRAGGING;
+                }
+                else if (clickedNodeIndex != -1)
+                {
+                    // A node was clicked
+                    grabbedPathIndex = selectedPathIndex;
+                    grabbedNodeIndex = clickedNodeIndex;
+                    grabbedHandleType = handleType::NODE;
+                    interactionState = DRAGGING;
+                }
+                else if (clickedPathIndex == -1)
+                {
+                    // Empty space clicked, deselect current
+                    writeSelectedPathToValueTree(-1);
+                }
+                else if (clickedPathIndex != selectedPathIndex)
+                {
+                    // New path clicked, make new selection
+                    writeSelectedPathToValueTree(clickedPathIndex);
+                }
+                else 
+                {
+                    // I have no idea what was clicked
                 }
             }
+            break;
         }
 
-        interactionState = DRAGGING;
-        break;
-        case TreeValues::ToolModeValues::PENCIL:
+        case (TreeValues::ToolModeValues::PENCIL):
+        {
             DBG("clicked in pencil mode");
-        break;
+            break;
+        }
     }
 
     
@@ -339,8 +436,9 @@ void GraphComponent::writePathsToValueTree()
     }
 }
 
-void GraphComponent::writeSelectedPathToValueTree(int selectedPathIndex)
+void GraphComponent::writeSelectedPathToValueTree(int newSelectedPathIndex)
 {
+    selectedPathIndex = newSelectedPathIndex;
     valueTree.setProperty(TreeValues::selectedPathIdentifier, selectedPathIndex, nullptr);
 }
 
