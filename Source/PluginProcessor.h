@@ -60,11 +60,7 @@ public:
     void pathStringsChanged();
 
 private:
-    juce::ValueTree valueTree {"tree", {},
-        {
-            {"Parameter", {{"id", "button"}, {"value", false}}}
-        }
-    };
+    juce::ValueTree valueTree {"tree", {}, {}};
 
     juce::MidiMessageSequence cachedMidiSequence;
     double deltaTimeInMilliseconds;

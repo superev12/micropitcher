@@ -22,6 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
 #include "interactionStates.h"
+#include "../TreeValues.h"
 
 enum class handleType {LEFT, NODE, RIGHT};
 //[/Headers]
@@ -74,6 +75,8 @@ private:
     int grabbedPathIndex = -1;
     int grabbedNodeIndex = -1;
     handleType grabbedHandleType = handleType::NODE;
+
+    TreeValues::ToolModeValues toolMode = TreeValues::ToolModeValues::POINTER;
 
     const float lineStrokeWidth = 5.0f;
     const float pointHandleRadius = 5.0f;

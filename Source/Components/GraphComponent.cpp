@@ -144,74 +144,83 @@ void GraphComponent::mouseDown (const juce::MouseEvent& e)
 
     auto mousePoint = e.getPosition().toFloat();
 
-    selectedPathIndex = -1;
-    // get was path selected
-    for (int pathIndex = 0; pathIndex < pathStrings.size(); pathIndex++)
+    switch (toolMode)
     {
-        auto nodeArray = pathHelper::stringToNodeArray(pathStrings[pathIndex]);
-        float distanceToPoint;
-        if (nodeArray.size() == 1)
+        case TreeValues::ToolModeValues::POINTER:
+            DBG("clicked in pointer mode");
+        selectedPathIndex = -1;
+        // get was path selected
+        for (int pathIndex = 0; pathIndex < pathStrings.size(); pathIndex++)
         {
-            distanceToPoint = mousePoint.getDistanceFrom(nodeArray[0].point);
-        } else {
-            juce::Path path;
-            path.restoreFromString(pathStrings[pathIndex]);
-            juce::Point<float> nearestPointToMouse;
-            path.getNearestPoint(mousePoint, nearestPointToMouse);
-            distanceToPoint = mousePoint.getDistanceFrom(nearestPointToMouse);
+            auto nodeArray = pathHelper::stringToNodeArray(pathStrings[pathIndex]);
+            float distanceToPoint;
+            if (nodeArray.size() == 1)
+            {
+                distanceToPoint = mousePoint.getDistanceFrom(nodeArray[0].point);
+            } else {
+                juce::Path path;
+                path.restoreFromString(pathStrings[pathIndex]);
+                juce::Point<float> nearestPointToMouse;
+                path.getNearestPoint(mousePoint, nearestPointToMouse);
+                distanceToPoint = mousePoint.getDistanceFrom(nearestPointToMouse);
+            }
+            if (distanceToPoint < 5.0f) selectedPathIndex = pathIndex;
+            DBG(juce::String(pathIndex) + juce::String(" e ") + juce::String(distanceToPoint));
+
         }
-        if (distanceToPoint < 5.0f) selectedPathIndex = pathIndex;
-        DBG(juce::String(pathIndex) + juce::String(" e ") + juce::String(distanceToPoint));
-
-    }
 
 
-    // get node clicked
-    for (int pathIndex = 0; pathIndex < pathStrings.size(); pathIndex++)
-    {
-        auto pathString = pathStrings[pathIndex];
-        auto nodeArray = pathHelper::stringToNodeArray(pathString);
-
-        for (int nodeIndex = 0; nodeIndex < nodeArray.size(); nodeIndex++)
+        // get node clicked
+        for (int pathIndex = 0; pathIndex < pathStrings.size(); pathIndex++)
         {
-            if
-            (
-                nodeArray[nodeIndex].point.getDistanceFrom(mousePoint)
-                    <
-                pointHandleRadius+pointHandleStrokeWeight/2
-            )
+            auto pathString = pathStrings[pathIndex];
+            auto nodeArray = pathHelper::stringToNodeArray(pathString);
+
+            for (int nodeIndex = 0; nodeIndex < nodeArray.size(); nodeIndex++)
             {
-                grabbedPathIndex = pathIndex;
-                grabbedNodeIndex = nodeIndex;
-                grabbedHandleType = handleType::NODE;
-                //DBG(juce::String::formatted("setting grabbedHandleType to %i", grabbedHandleType));
-            }
-            else if
-            (
-                nodeArray[nodeIndex].handleL.getDistanceFrom(mousePoint)
-                    <
-                pointHandleRadius+pointHandleStrokeWeight/2
-            )
-            {
-                grabbedPathIndex = pathIndex;
-                grabbedNodeIndex = nodeIndex;
-                grabbedHandleType = handleType::LEFT;
-            }
-            else if
-            (
-                nodeArray[nodeIndex].handleR.getDistanceFrom(mousePoint)
-                    <
-                pointHandleRadius+pointHandleStrokeWeight/2
-            )
-            {
-                grabbedPathIndex = pathIndex;
-                grabbedNodeIndex = nodeIndex;
-                grabbedHandleType = handleType::RIGHT;
+                if
+                (
+                    nodeArray[nodeIndex].point.getDistanceFrom(mousePoint)
+                        <
+                    pointHandleRadius+pointHandleStrokeWeight/2
+                )
+                {
+                    grabbedPathIndex = pathIndex;
+                    grabbedNodeIndex = nodeIndex;
+                    grabbedHandleType = handleType::NODE;
+                    //DBG(juce::String::formatted("setting grabbedHandleType to %i", grabbedHandleType));
+                }
+                else if
+                (
+                    nodeArray[nodeIndex].handleL.getDistanceFrom(mousePoint)
+                        <
+                    pointHandleRadius+pointHandleStrokeWeight/2
+                )
+                {
+                    grabbedPathIndex = pathIndex;
+                    grabbedNodeIndex = nodeIndex;
+                    grabbedHandleType = handleType::LEFT;
+                }
+                else if
+                (
+                    nodeArray[nodeIndex].handleR.getDistanceFrom(mousePoint)
+                        <
+                    pointHandleRadius+pointHandleStrokeWeight/2
+                )
+                {
+                    grabbedPathIndex = pathIndex;
+                    grabbedNodeIndex = nodeIndex;
+                    grabbedHandleType = handleType::RIGHT;
+                }
             }
         }
-    }
 
-    interactionState = DRAGGING;
+        interactionState = DRAGGING;
+        break;
+        case TreeValues::ToolModeValues::PENCIL:
+            DBG("clicked in pencil mode");
+        break;
+    }
 
     
     //pathStrings[0] = pathHelper::moveNode(pathStrings[0], 0, e.getPosition().toFloat());
@@ -291,6 +300,11 @@ void GraphComponent::valueTreePropertyChanged(juce::ValueTree& tree, const juce:
     if (id == TreeValues::selectedPathIdentifier)
     {
         selectedPathIndex = (int) valueTree.getProperty(id);
+    }
+
+    if (id == TreeValues::toolModeIdentifier)
+    {
+        toolMode = static_cast<TreeValues::ToolModeValues>((int) valueTree.getProperty(id));
     }
 }
 

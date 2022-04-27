@@ -26,6 +26,8 @@ MicropitcherAudioProcessor::MicropitcherAudioProcessor()
 #endif
 {
     valueTree.addListener(this);
+
+    valueTree.setProperty(TreeValues::toolModeIdentifier, TreeValues::ToolModeValues::POINTER, nullptr);
 }
 
 MicropitcherAudioProcessor::~MicropitcherAudioProcessor()

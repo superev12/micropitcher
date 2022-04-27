@@ -21,6 +21,7 @@
 //[/Headers]
 
 #include "ToolbarComponent.h"
+#include "../TreeValues.h"
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
@@ -35,12 +36,12 @@ ToolbarComponent::ToolbarComponent (juce::ValueTree& state) : valueTree(state)
 
     juce__textButton.reset (new juce::TextButton ("new button"));
     addAndMakeVisible (juce__textButton.get());
-    juce__textButton->setButtonText (TRANS("new button1"));
+    juce__textButton->setButtonText (TRANS("Pointer"));
     juce__textButton->addListener (this);
 
     juce__textButton2.reset (new juce::TextButton ("new button"));
     addAndMakeVisible (juce__textButton2.get());
-    juce__textButton2->setButtonText (TRANS("new button2"));
+    juce__textButton2->setButtonText (TRANS("Pencil"));
     juce__textButton2->addListener (this);
 
 
@@ -98,13 +99,13 @@ void ToolbarComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     if (buttonThatWasClicked == juce__textButton.get())
     {
         //[UserButtonCode_juce__textButton] -- add your button handler code here..
-        valueTree.setProperty(propertyName, true, nullptr);
+        valueTree.setProperty(TreeValues::toolModeIdentifier, TreeValues::ToolModeValues::POINTER, nullptr);
         //[/UserButtonCode_juce__textButton]
     }
     else if (buttonThatWasClicked == juce__textButton2.get())
     {
         //[UserButtonCode_juce__textButton2] -- add your button handler code here..
-        valueTree.setProperty(propertyName, false, nullptr);
+        valueTree.setProperty(TreeValues::toolModeIdentifier, TreeValues::ToolModeValues::PENCIL, nullptr);
         //[/UserButtonCode_juce__textButton2]
     }
 
