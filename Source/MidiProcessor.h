@@ -113,7 +113,8 @@ std::vector<double> sampleSemitoneDeviation(pathHelper::NodeArray nodeArray, flo
 juce::MidiMessageSequence renderNodeArrayToMidiSequence(pathHelper::NodeArray nodeArray)
 {
     auto midiSequence = juce::MidiMessageSequence();
-    int medianMidiNoteNumber = getMedianMidiNoteNumber(nodeArray);
+    int medianMidiNoteNumber = (int) pathHelper::clampFloat(getMedianMidiNoteNumber(nodeArray), 0.0f, 127.0f);
+
 
     // Add midiOn at path start
     juce::MidiMessage firstMessage = juce::MidiMessage::noteOn(1, medianMidiNoteNumber, 0.5f);

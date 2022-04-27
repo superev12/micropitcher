@@ -178,8 +178,7 @@ namespace pathHelper
 
         return pathString;
     }
-
-    // Test cases
+// Test cases
     // `a m 123 456` -> `1`
     // `a m 123 456 c 123 456 789 123 456 789` -> `2`
     // `a m 123 456 c 123 456 789 123 456 789 123 456 789 123 456 789` -> `3`
@@ -293,6 +292,39 @@ namespace pathHelper
         nodeArray[nodeIndex].handleR.x = clampFloat(newPosition.x, bottom, top);
         nodeArray[nodeIndex].handleR.y = newPosition.y;
         return nodeArrayToString(nodeArray);
+    }
+
+    // Test cases
+    // `a m 123 456`, `(125, 432)` -> `a m 123 432 c 123 432 125 456 125 456`
+    // `a m 123 456`, `(120, 432)` -> `a m 120 452 c 120 452 123 432 123 432`
+    static juce::String addNode(juce::String& pathString, juce::Point<float> newPosition)
+    {
+        NodeArray nodeArray = stringToNodeArray(pathString);
+        Node newNode { .point = newPosition, .handleL = newPosition, .handleR = newPosition };
+
+        if (newNode.point.x < nodeArray[0].point.x)
+        {
+            // Node is at the start of path
+            nodeArray.insert(nodeArray.begin(), newNode);
+        }
+        else if (newNode.point.x >= nodeArray[nodeArray.size()-1].point.x)
+        {
+            // Node is at the end of path
+            nodeArray.push_back(newNode);
+        }
+        else
+        {
+            // Node is in the middle of path
+            for (int i = 0; i < nodeArray.size() - 2; i++)
+            {
+                if (nodeArray[i].point.x < newNode.point.x && newNode.point.x <= nodeArray[i+1].point.x)
+                {
+                    nodeArray.insert(nodeArray.begin()+i+1, newNode);
+                }
+            }
+        }
+        return nodeArrayToString(nodeArray);
+        
     }
 }
 

@@ -43,17 +43,7 @@ GraphComponent::GraphComponent (juce::ValueTree& state) : valueTree(state)
     // Add ValueTree for graph
     juce::ValueTree graphState (TreeValues::graphIdentifier);
     valueTree.addChild(graphState, -1, nullptr);
-    writeSelectedPathToValueTree(0);
-
-    // Add Test path to graph valueTree
-
-    juce::ValueTree pathTree1 (TreeValues::pathTreeIdentifier);
-    pathTree1.setProperty(TreeValues::pathStringIdentifier, "a m 45 120.428 c 71.5 126.9725 75.7675 72.15 104.1315 94.125 118.315 106.555 146.63 152.8575 184.5 154.23025 223.735 93.8025 213.3325 129 227.6475 115.12", nullptr);
-    valueTree.getChildWithName(TreeValues::graphIdentifier).addChild(pathTree1, 0, nullptr);
-
-    juce::ValueTree pathTree2 (TreeValues::pathTreeIdentifier);
-    pathTree2.setProperty(TreeValues::pathStringIdentifier, "a m 10 10", nullptr);
-    valueTree.getChildWithName(TreeValues::graphIdentifier).addChild(pathTree2, 1, nullptr);
+    writeSelectedPathToValueTree(selectedPathIndex);
 
     readPathsFromValueTree();
 
@@ -315,6 +305,25 @@ void GraphComponent::mouseDown (const juce::MouseEvent& e)
         case (TreeValues::ToolModeValues::PENCIL):
         {
             DBG("clicked in pencil mode");
+            if (selectedPathIndex == -1)
+            {
+                // No path was selected, create new path at cursor
+                auto newPathString = pathHelper::nodeArrayToString
+                ({{
+                    .point=mousePoint,
+                    .handleL=mousePoint,
+                    .handleR=mousePoint,
+                }});
+                pathStrings.push_back(newPathString);
+                writeSelectedPathToValueTree(pathStrings.size() - 1);
+                writePathsToValueTree();
+            }
+            else
+            {
+                // Path was selected, add node to path at cursor
+                pathStrings[selectedPathIndex] = pathHelper::addNode(pathStrings[selectedPathIndex], mousePoint);
+                writePathsToValueTree();
+            }
             break;
         }
     }
